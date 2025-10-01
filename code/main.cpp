@@ -21,6 +21,11 @@ int main()
 
         sc->Fill(settings->black);
         rg::draw::circle(sc, settings->green, player.pos(), 12);
+        rg::draw::line(
+                sc, settings->green, player.pos(),
+                {player.x + settings->width * cosf(player.angle),
+                 player.y + settings->height * sinf(player.angle)}
+                );
         rg::display::Update();
     }
 
