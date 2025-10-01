@@ -6,13 +6,18 @@ int main()
 {
     rg::Init();
 
-    auto* sc = &rg::display::SetMode(Settings::width, Settings::height);
+    const Settings *settings = Settings::GetInstance();
+
+    auto *sc = &rg::display::SetMode(settings->width, settings->height);
 
     while (!rg::WindowCloseOrQuit())
     {
-        sc->Fill(Settings::black);
+        sc->Fill(settings->black);
+        rg::draw::circle(sc, settings->green, settings->player_pos, 12);
         rg::display::Update();
     }
+
+    Settings::Destroy();
 
     rg::Quit();
 }
