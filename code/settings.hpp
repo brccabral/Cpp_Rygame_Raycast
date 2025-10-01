@@ -23,6 +23,7 @@ public:
     float player_angle = 2.0f;
     float player_speed = 120.0f;
     float player_rotation = 1.2f;
+    int tile = 100;
 
 private:
 
