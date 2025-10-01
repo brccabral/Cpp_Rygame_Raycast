@@ -21,8 +21,8 @@ public:
     rl::Color purple = {120, 0, 120, 255};
     rg::math::Vector2 player_pos = {1200 / 2, 800 / 2};
     float player_angle = 2.0f;
-    float player_speed = 0.0f;
-    float player_rotation = 0.0f;
+    float player_speed = 80.0f;
+    float player_rotation = 0.4f;
 
 private:
 

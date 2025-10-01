@@ -8,6 +8,7 @@ endif ()
 add_executable(
     ${PROJECT_NAME}
     code/main.cpp
+    code/player.cpp
     code/settings.cpp
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE rygame)
