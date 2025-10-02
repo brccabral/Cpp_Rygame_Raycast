@@ -3,6 +3,7 @@
 #include "maplevels.hpp"
 #include "settings.hpp"
 #include "player.hpp"
+#include "ray_casting.hpp"
 
 
 int main()
@@ -22,6 +23,9 @@ int main()
         player.movement(dt);
 
         sc->Fill(settings->black);
+
+        ray_casting(sc, player.pos(), player.angle);
+
         rg::draw::circle(sc, settings->green, player.pos(), 12);
         rg::draw::line(
                 sc, settings->green, player.pos(),

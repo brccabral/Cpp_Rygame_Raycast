@@ -25,6 +25,12 @@ public:
     float player_rotation = 1.2f;
     int tile = 100;
 
+    float fov = PI / 3.0f;
+    float half_fov = fov / 2.0f;
+    int num_rays = 120;
+    int max_depth = 800;
+    float delta_angle = fov / num_rays;
+
 private:
 
     Settings() = default;

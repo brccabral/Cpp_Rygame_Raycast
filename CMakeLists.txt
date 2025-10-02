@@ -10,6 +10,7 @@ add_executable(
     code/main.cpp
     code/maplevels.cpp
     code/player.cpp
+    code/ray_casting.cpp
     code/settings.cpp
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE rygame)
