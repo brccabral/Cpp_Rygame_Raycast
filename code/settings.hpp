@@ -19,10 +19,6 @@ public:
     rl::Color blue = {0, 0, 220, 255};
     rl::Color darkgray = {110, 110, 110, 255};
     rl::Color purple = {120, 0, 120, 255};
-    rg::math::Vector2 player_pos = {width / 2, height / 2};
-    float player_angle = 2.0f;
-    float player_speed = 120.0f;
-    float player_rotation = 1.2f;
     int tile = 100;
 
     float fov = PI / 3.0f;

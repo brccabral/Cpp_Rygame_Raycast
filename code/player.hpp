@@ -6,16 +6,16 @@ class Player
 {
 public:
 
-    Player();
+    Player(const rg::math::Vector2 &pos, float angle, int speed, float rotation_speed);
     ~Player() = default;
 
-    rg::math::Vector2 pos() const;
+    [[nodiscard]] rg::math::Vector2 pos() const;
     void movement(float dt);
 
     float x{};
     float y{};
     float angle{};
-    float player_speed{};
-    float player_rotation{};
+    int speed{};
+    float rotation_speed{};
 
 };

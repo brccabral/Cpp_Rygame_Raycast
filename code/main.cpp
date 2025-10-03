@@ -15,7 +15,9 @@ int main()
     auto *sc = &rg::display::SetMode(settings->width, settings->height);
     float dt = 0;
 
-    auto player = Player();
+    auto player = Player(
+            {Settings::GetInstance()->half_width, Settings::GetInstance()->half_height}, 0.f, 120,
+            1.2f);
 
     while (!rg::WindowCloseOrQuit())
     {
