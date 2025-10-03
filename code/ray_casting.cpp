@@ -1,5 +1,6 @@
 #include "ray_casting.hpp"
 
+#include "maplevels.hpp"
 #include "settings.hpp"
 
 
@@ -15,7 +16,15 @@ void ray_casting(rg::Surface *sc, rg::math::Vector2 player_pos, float player_ang
         {
             auto x = xo + depth * cos_a;
             auto y = yo + depth * sin_a;
+            int xi = int(x / Settings::GetInstance()->tile) * Settings::GetInstance()->tile;
+            int yi = int(y / Settings::GetInstance()->tile) * Settings::GetInstance()->tile;
+            if (MapLevels::GetInstance()->world_map.find({xi, yi}) !=
+                MapLevels::GetInstance()->world_map.end())
+            {
+                break;
+            }
             rg::draw::line(sc, Settings::GetInstance()->darkgray, player_pos, {x, y}, 2);
+
         }
         cur_angle += Settings::GetInstance()->delta_angle;
     }
