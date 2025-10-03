@@ -76,11 +76,16 @@ void Player::ray_casting(rg::Surface *sc)
             auto yf = y + depth * sin_a;
             int xi = int(xf / settings->tile) * settings->tile;
             int yi = int(yf / settings->tile) * settings->tile;
+            // stop ray casting if ray touches a wall
             if (MapLevels::GetInstance()->world_map.find({xi, yi}) !=
                 MapLevels::GetInstance()->world_map.end())
             {
+                // show ray line when they hit a wall
                 rg::draw::line(&map_surface, settings->darkgray, pos(), {xf, yf}, 2);
+                // remove fish eye effect
+                depth *= cosf(angle - cur_angle);
                 auto proj_height = settings->proj_coeff / depth;
+                // closer walls are brighter
                 const unsigned char c = 255 / (1 + depth * depth * 0.0001);
                 auto color = rl::Color{c, c, c, 255};
                 rg::draw::rect(
