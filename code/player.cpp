@@ -87,12 +87,13 @@ void Player::ray_casting(rg::Surface *sc)
                 auto proj_height = settings->proj_coeff / depth;
                 // closer walls are brighter
                 const unsigned char c = 255 / (1 + depth * depth * 0.0001);
-                auto color = rl::Color{c, c, c, 255};
+                auto color = rl::Color{c, static_cast<unsigned char>(c / 2),
+                                       static_cast<unsigned char>(c / 3), 255};
                 rg::draw::rect(
                         sc, color, {
-                                (float) ray * settings->scale,
-                                settings->half_height - proj_height / 2,
-                                (float) settings->scale,
+                                static_cast<float>(ray * settings->scale),
+                                settings->half_height - proj_height / 2.0f,
+                                static_cast<float>(settings->scale),
                                 proj_height
                         });
                 break;

@@ -18,8 +18,9 @@ public:
     rl::Color red = {220, 0, 0, 255};
     rl::Color green = {0, 220, 0, 255};
     rl::Color blue = {0, 0, 220, 255};
-    rl::Color darkgray = {110, 110, 110, 255};
+    rl::Color darkgray = {40, 40, 40, 255};
     rl::Color purple = {120, 0, 120, 255};
+    rl::Color skyblue = {0, 186, 255, 255};
     int tile = 100;
 
     float fov = PI / 3.0f;
