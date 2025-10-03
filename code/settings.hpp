@@ -14,6 +14,7 @@ public:
     int half_height = height / 2;
     rl::Color white = {255, 255, 255, 255};
     rl::Color black = {0, 0, 0, 255};
+    rl::Color blank = {0, 0, 0, 0};
     rl::Color red = {220, 0, 0, 255};
     rl::Color green = {0, 220, 0, 255};
     rl::Color blue = {0, 0, 220, 255};

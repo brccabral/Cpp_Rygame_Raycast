@@ -1,9 +1,7 @@
 #include <rygame.hpp>
 
-#include "maplevels.hpp"
 #include "settings.hpp"
 #include "player.hpp"
-#include "ray_casting.hpp"
 
 
 int main()
@@ -22,26 +20,10 @@ int main()
     while (!rg::WindowCloseOrQuit())
     {
         dt = rl::GetFrameTime();
-        player.movement(dt);
 
         sc->Fill(settings->black);
 
-        ray_casting(sc, player.pos(), player.angle);
-
-        rg::draw::circle(sc, settings->green, player.pos(), 12);
-        rg::draw::line(
-                sc, settings->green, player.pos(),
-                {player.x + settings->width * cosf(player.angle),
-                 player.y + settings->height * sinf(player.angle)}
-                );
-
-        for (auto &[x, y]: MapLevels::GetInstance()->world_map | std::views::keys)
-        {
-            rg::draw::rect(
-                    sc, settings->darkgray, {x, y, (float) settings->tile,
-                                             (float) settings->tile},
-                    2);
-        }
+        player.movement(dt, sc);
 
         rg::display::Update();
     }
