@@ -29,7 +29,7 @@ public:
 
     // projection
     float dist = num_rays / (2 * tanf(half_fov));
-    float proj_coeff = dist * tile;
+    float proj_coeff = 3 * dist * tile;
     int scale = width / num_rays;
 
 private:
