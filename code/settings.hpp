@@ -10,8 +10,8 @@ public:
 
     int width = 1200;
     int height = 800;
-    int half_width = 1200 / 2;
-    int half_height = 800 / 2;
+    int half_width = width / 2;
+    int half_height = height / 2;
     rl::Color white = {255, 255, 255, 255};
     rl::Color black = {0, 0, 0, 255};
     rl::Color red = {220, 0, 0, 255};
@@ -19,7 +19,7 @@ public:
     rl::Color blue = {0, 0, 220, 255};
     rl::Color darkgray = {110, 110, 110, 255};
     rl::Color purple = {120, 0, 120, 255};
-    rg::math::Vector2 player_pos = {1200 / 2, 800 / 2};
+    rg::math::Vector2 player_pos = {width / 2, height / 2};
     float player_angle = 2.0f;
     float player_speed = 120.0f;
     float player_rotation = 1.2f;
@@ -30,6 +30,11 @@ public:
     int num_rays = 120;
     int max_depth = 800;
     float delta_angle = fov / num_rays;
+
+    // projection
+    float dist = num_rays / (2 * tanf(half_fov));
+    float proj_coeff = dist * tile;
+    int scale = width / num_rays;
 
 private:
 

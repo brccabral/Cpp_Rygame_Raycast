@@ -21,6 +21,14 @@ void ray_casting(rg::Surface *sc, rg::math::Vector2 player_pos, float player_ang
             if (MapLevels::GetInstance()->world_map.find({xi, yi}) !=
                 MapLevels::GetInstance()->world_map.end())
             {
+                auto proj_height = Settings::GetInstance()->proj_coeff / depth;
+                rg::draw::rect(
+                        sc, Settings::GetInstance()->white, {
+                                (float) ray * Settings::GetInstance()->scale,
+                                Settings::GetInstance()->half_height - proj_height / 2,
+                                (float) Settings::GetInstance()->scale,
+                                proj_height
+                        });
                 break;
             }
             rg::draw::line(sc, Settings::GetInstance()->darkgray, player_pos, {x, y}, 2);
