@@ -81,8 +81,10 @@ void Player::ray_casting(rg::Surface *sc)
             {
                 rg::draw::line(&map_surface, settings->darkgray, pos(), {xf, yf}, 2);
                 auto proj_height = settings->proj_coeff / depth;
+                const unsigned char c = 255 / (1 + depth * depth * 0.0001);
+                auto color = rl::Color{c, c, c, 255};
                 rg::draw::rect(
-                        sc, settings->white, {
+                        sc, color, {
                                 (float) ray * settings->scale,
                                 settings->half_height - proj_height / 2,
                                 (float) settings->scale,
