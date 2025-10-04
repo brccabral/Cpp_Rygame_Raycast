@@ -52,9 +52,6 @@ void Player::movement(const float dt, rg::Surface *sc)
         angle += rotation_speed * dt;
     }
 
-    map_surface.Fill(settings->blank);
-    ray_casting(sc);
-
     if (rl::IsKeyDown(rl::KEY_TAB))
     {
         show_map(sc);

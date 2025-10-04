@@ -17,7 +17,7 @@ int main()
     auto player = Player(
             {Settings::GetInstance()->half_width, Settings::GetInstance()->half_height}, 0.f, 120,
             1.2f);
-    auto drawing = Drawing(sc);
+    const auto drawing = Drawing(sc, &player);
 
     while (!rg::WindowCloseOrQuit())
     {
@@ -25,8 +25,11 @@ int main()
 
         sc->Fill(settings->black);
         drawing.background();
+        drawing.world();
 
         player.movement(dt, sc);
+
+        drawing.fps(dt);
 
         rg::display::Update();
     }
