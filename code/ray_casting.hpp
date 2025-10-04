@@ -5,10 +5,10 @@
 #include "settings.hpp"
 
 template<typename N>
-rg::math::Vector2 mapping(N a, N b)
+rg::math::Vector2<int> mapping(N a, N b)
 {
-    int xi = int(a / Settings::GetInstance()->tile) * Settings::GetInstance()->tile;
-    int yi = int(b / Settings::GetInstance()->tile) * Settings::GetInstance()->tile;
+    int xi = int(int(a / Settings::GetInstance()->tile) * Settings::GetInstance()->tile);
+    int yi = int(int(b / Settings::GetInstance()->tile) * Settings::GetInstance()->tile);
     return {xi, yi};
 }
 

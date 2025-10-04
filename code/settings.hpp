@@ -34,7 +34,7 @@ public:
     float proj_coeff = 3 * dist * tile;
     int scale = width / num_rays;
 
-    rg::math::Vector2 fps_pos = {width - 110, 5};
+    rg::math::Vector2<float> fps_pos = {width - 100.0f, 5};
 
 private:
 

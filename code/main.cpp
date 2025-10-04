@@ -16,7 +16,8 @@ int main()
         float dt = 0;
 
         auto player = Player(
-                {Settings::GetInstance()->half_width, Settings::GetInstance()->half_height}, 0.f,
+                {static_cast<float>(Settings::GetInstance()->half_width),
+                 static_cast<float>(Settings::GetInstance()->half_height)}, 0.f,
                 120,
                 1.2f);
         const auto drawing = Drawing(sc, &player);

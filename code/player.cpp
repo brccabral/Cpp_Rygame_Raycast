@@ -4,7 +4,7 @@
 #include "settings.hpp"
 
 Player::Player(
-        const rg::math::Vector2 &pos, const float angle, const int speed,
+        const rg::math::Vector2<float> &pos, const float angle, const int speed,
         const float rotation_speed)
     : x(pos.x), y(pos.y), angle(angle), speed(speed), rotation_speed(rotation_speed),
       settings(Settings::GetInstance())
@@ -13,7 +13,7 @@ Player::Player(
     map_surface.SetColorKey(settings->black);
 }
 
-rg::math::Vector2 Player::pos() const
+rg::math::Vector2<float> Player::pos() const
 {
     return {x, y};
 }
@@ -68,12 +68,14 @@ void Player::show_map(rg::Surface *sc)
              y + settings->height * sinf(angle)}
             );
 
-    for (auto &[mapx, mapy]: MapLevels::GetInstance()->world_map | std::views::keys)
+    for (auto &[map_x, map_y]: MapLevels::GetInstance()->world_map | std::views::keys)
     {
         rg::draw::rect(
-                &map_surface, settings->darkgray, {mapx, mapy, (float) settings->tile,
-                                                   (float) settings->tile},
+                &map_surface, settings->white, {static_cast<float>(map_x),
+                                                static_cast<float>(map_y),
+                                                static_cast<float>(settings->tile),
+                                                static_cast<float>(settings->tile)},
                 2);
     }
-    sc->Blit(&map_surface, {0, 0});
+    sc->Blit(&map_surface, rg::math::Vector2<float>{});
 }
