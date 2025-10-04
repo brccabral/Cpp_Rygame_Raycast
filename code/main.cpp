@@ -1,5 +1,6 @@
 #include <rygame.hpp>
 
+#include "drawing.hpp"
 #include "settings.hpp"
 #include "player.hpp"
 
@@ -16,20 +17,14 @@ int main()
     auto player = Player(
             {Settings::GetInstance()->half_width, Settings::GetInstance()->half_height}, 0.f, 120,
             1.2f);
+    auto drawing = Drawing(sc);
 
     while (!rg::WindowCloseOrQuit())
     {
         dt = rl::GetFrameTime();
 
         sc->Fill(settings->black);
-        rg::draw::rect(
-                sc, settings->skyblue,
-                {0, 0, static_cast<float>(settings->width),
-                 static_cast<float>(settings->half_height)});
-        rg::draw::rect(
-                sc, settings->darkgray,
-                {0, static_cast<float>(settings->half_height), static_cast<float>(settings->width),
-                 static_cast<float>(settings->half_height)});
+        drawing.background();
 
         player.movement(dt, sc);
 
