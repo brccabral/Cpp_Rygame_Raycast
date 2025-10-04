@@ -9,32 +9,35 @@ int main()
 {
     rg::Init();
 
-    const Settings *settings = Settings::GetInstance();
-
-    auto *sc = &rg::display::SetMode(settings->width, settings->height);
-    float dt = 0;
-
-    auto player = Player(
-            {Settings::GetInstance()->half_width, Settings::GetInstance()->half_height}, 0.f, 120,
-            1.2f);
-    const auto drawing = Drawing(sc, &player);
-
-    while (!rg::WindowCloseOrQuit())
     {
-        dt = rl::GetFrameTime();
+        const Settings *settings = Settings::GetInstance();
 
-        sc->Fill(settings->black);
-        drawing.background();
-        drawing.world();
+        auto *sc = &rg::display::SetMode(settings->width, settings->height);
+        float dt = 0;
 
-        player.movement(dt, sc);
+        auto player = Player(
+                {Settings::GetInstance()->half_width, Settings::GetInstance()->half_height}, 0.f,
+                120,
+                1.2f);
+        const auto drawing = Drawing(sc, &player);
 
-        drawing.fps(dt);
+        while (!rg::WindowCloseOrQuit())
+        {
+            dt = rl::GetFrameTime();
 
-        rg::display::Update();
+            sc->Fill(settings->black);
+            drawing.background();
+            drawing.world();
+
+            player.movement(dt, sc);
+
+            drawing.fps(dt);
+
+            rg::display::Update();
+        }
+
+        Settings::Destroy();
     }
-
-    Settings::Destroy();
 
     rg::Quit();
 }

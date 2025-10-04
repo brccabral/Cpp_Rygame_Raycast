@@ -12,7 +12,6 @@ public:
 
     [[nodiscard]] rg::math::Vector2 pos() const;
     void movement(float dt, rg::Surface *sc);
-    void ray_casting(rg::Surface *sc);
     void show_map(rg::Surface *sc);
 
     float x{};

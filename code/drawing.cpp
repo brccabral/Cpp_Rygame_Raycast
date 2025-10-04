@@ -1,5 +1,7 @@
 #include "drawing.hpp"
 
+#include "ray_casting.hpp"
+
 Drawing::Drawing(rg::Surface *sc, Player *player)
     : sc(sc), settings(Settings::GetInstance()), player(player)
 {
@@ -20,7 +22,7 @@ void Drawing::background() const
 
 void Drawing::world() const
 {
-    player->ray_casting(sc);
+    ray_casting_distance(sc, player);
 }
 
 void Drawing::fps(const float dt) const

@@ -59,47 +59,6 @@ void Player::movement(const float dt, rg::Surface *sc)
 
 }
 
-
-void Player::ray_casting(rg::Surface *sc)
-{
-    auto cur_angle = angle - settings->half_fov;
-    for (int ray = 0; ray < settings->num_rays; ++ray)
-    {
-        auto sin_a = sinf(cur_angle);
-        auto cos_a = cosf(cur_angle);
-        for (int depth = 0; depth < settings->max_depth; ++depth)
-        {
-            auto xf = x + depth * cos_a;
-            auto yf = y + depth * sin_a;
-            int xi = int(xf / settings->tile) * settings->tile;
-            int yi = int(yf / settings->tile) * settings->tile;
-            // stop ray casting if ray touches a wall
-            if (MapLevels::GetInstance()->world_map.find({xi, yi}) !=
-                MapLevels::GetInstance()->world_map.end())
-            {
-                // show ray line when they hit a wall
-                rg::draw::line(&map_surface, settings->darkgray, pos(), {xf, yf}, 2);
-                // remove fish eye effect
-                depth *= cosf(angle - cur_angle);
-                auto proj_height = settings->proj_coeff / depth;
-                // closer walls are brighter
-                const unsigned char c = 255 / (1 + depth * depth * 0.0001);
-                auto color = rl::Color{c, static_cast<unsigned char>(c / 2),
-                                       static_cast<unsigned char>(c / 3), 255};
-                rg::draw::rect(
-                        sc, color, {
-                                static_cast<float>(ray * settings->scale),
-                                settings->half_height - proj_height / 2.0f,
-                                static_cast<float>(settings->scale),
-                                proj_height
-                        });
-                break;
-            }
-        }
-        cur_angle += settings->delta_angle;
-    }
-}
-
 void Player::show_map(rg::Surface *sc)
 {
     rg::draw::circle(&map_surface, settings->green, pos(), 12);
