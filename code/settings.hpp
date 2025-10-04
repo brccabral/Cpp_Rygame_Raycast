@@ -21,11 +21,12 @@ public:
     rl::Color darkgray = {40, 40, 40, 255};
     rl::Color purple = {120, 0, 120, 255};
     rl::Color skyblue = {0, 186, 255, 255};
+    rl::Color raycolor = {220, 220, 0, 255};
     int tile = 100;
 
     float fov = PI / 3.0f;
     float half_fov = fov / 2.0f;
-    int num_rays = 120;
+    int num_rays = 300;
     int max_depth = 800;
     float delta_angle = fov / num_rays;
 
