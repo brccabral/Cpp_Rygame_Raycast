@@ -13,6 +13,9 @@ int main()
         const Settings *settings = Settings::GetInstance();
 
         auto *sc = &rg::display::SetMode(settings->width, settings->height);
+        auto sc_map = rg::Surface(
+                settings->width / settings->map_scale, settings->height / settings->map_scale);
+
         float dt = 0;
 
         auto player = Player(
@@ -20,18 +23,19 @@ int main()
                  static_cast<float>(Settings::GetInstance()->half_height)}, 0.f,
                 120,
                 1.2f);
-        const auto drawing = Drawing(sc, &player);
+        const auto drawing = Drawing(sc, &sc_map, &player);
 
         while (!rg::WindowCloseOrQuit())
         {
             dt = rl::GetFrameTime();
 
-            sc->Fill(settings->black);
-            drawing.background();
-            drawing.world();
-
             player.movement(dt, sc);
 
+            sc->Fill(settings->black);
+
+            drawing.background();
+            drawing.world();
+            drawing.mini_map();
             drawing.fps(dt);
 
             rg::display::Update();

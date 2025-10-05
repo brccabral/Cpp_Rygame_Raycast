@@ -4,7 +4,7 @@
 #include "settings.hpp"
 
 
-void ray_casting_distance(rg::Surface *sc, Player *player)
+void ray_casting_distance(rg::Surface *sc, rg::Surface *sc_map, Player *player)
 {
     auto cur_angle = player->angle - Settings::GetInstance()->half_fov;
     auto [xo, yo] = player->pos();
@@ -22,8 +22,9 @@ void ray_casting_distance(rg::Surface *sc, Player *player)
             {
                 // show ray line when they hit a wall
                 rg::draw::line(
-                        &player->map_surface, Settings::GetInstance()->raycolor, player->pos(),
-                        {x, y}, 2);
+                        sc_map, Settings::GetInstance()->raycolor, player->pos_map(),
+                        {x / Settings::GetInstance()->map_scale,
+                         y / Settings::GetInstance()->map_scale}, 2);
                 // remove fish eye effect
                 depth *= cosf(player->angle - cur_angle);
                 auto proj_height = Settings::GetInstance()->proj_coeff / depth;
@@ -45,7 +46,7 @@ void ray_casting_distance(rg::Surface *sc, Player *player)
     }
 }
 
-void ray_casting_depth(rg::Surface *sc, Player *player)
+void ray_casting_depth(rg::Surface *sc, rg::Surface *sc_map, Player *player)
 {
     auto [ox, oy] = player->pos();
     auto [xm, ym] = mapping(ox, oy);
@@ -116,8 +117,9 @@ void ray_casting_depth(rg::Surface *sc, Player *player)
 
         // show only rays when they hit wall
         rg::draw::line(
-                &player->map_surface, Settings::GetInstance()->raycolor, player->pos(),
-                {ray_x, ray_y}, 2);
+                sc_map, Settings::GetInstance()->raycolor, player->pos_map(),
+                {ray_x / Settings::GetInstance()->map_scale,
+                 ray_y / Settings::GetInstance()->map_scale}, 2);
         // remove fish eye effect
         depth *= cosf(player->angle - cur_angle);
         // project wall

@@ -16,12 +16,13 @@ public:
     rl::Color black = {0, 0, 0, 255};
     rl::Color blank = {0, 0, 0, 0};
     rl::Color red = {220, 0, 0, 255};
-    rl::Color green = {0, 220, 0, 255};
+    rl::Color green = {0, 80, 0, 255};
     rl::Color blue = {0, 0, 220, 255};
     rl::Color darkgray = {40, 40, 40, 255};
     rl::Color purple = {120, 0, 120, 255};
     rl::Color skyblue = {0, 186, 255, 255};
     rl::Color raycolor = {220, 220, 0, 255};
+    rl::Color yellow = {220, 220, 0, 255};
     int tile = 100;
 
     float fov = PI / 3.0f;
@@ -32,10 +33,15 @@ public:
 
     // projection
     float dist = num_rays / (2 * tanf(half_fov));
-    float proj_coeff = 3 * dist * tile;
+    float proj_coeff = dist * tile;
     int scale = width / num_rays;
 
     rg::math::Vector2<float> fps_pos = {width - 100.0f, 5};
+
+    // mini map
+    int map_scale = 5;
+    int map_tile = tile / map_scale;
+    rg::math::Vector2<int> map_pos = {0, height - height / map_scale};
 
 private:
 

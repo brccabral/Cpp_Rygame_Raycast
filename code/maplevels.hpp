@@ -10,6 +10,7 @@ public:
     static void Destroy();
 
     rg::InsertOrderMap<rg::math::Vector2<int>, int> world_map{};
+    rg::InsertOrderMap<rg::math::Vector2<int>, int> mini_map{};
 
 private:
 
