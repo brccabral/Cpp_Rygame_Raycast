@@ -23,7 +23,7 @@ int main()
                  static_cast<float>(Settings::GetInstance()->half_height)}, 0.f,
                 120,
                 1.2f);
-        const auto drawing = Drawing(sc, &sc_map, &player);
+        auto drawing = Drawing(sc, &sc_map, &player);
 
         while (!rg::WindowCloseOrQuit())
         {

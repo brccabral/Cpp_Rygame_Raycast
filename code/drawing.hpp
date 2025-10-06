@@ -1,7 +1,7 @@
 #pragma once
+#include <rygame.hpp>
 #include "maplevels.hpp"
 #include "player.hpp"
-#include "rygame.hpp"
 #include "settings.hpp"
 
 
@@ -13,7 +13,7 @@ public:
 
     void background() const;
     void world() const;
-    void fps(float dt) const;
+    void fps(float dt);
     void mini_map() const;
 
     rg::Surface *sc;
@@ -21,5 +21,6 @@ public:
     Settings *settings;
     MapLevels *map_levels;
     Player *player;
+    rg::Surface fps_text_surface{};
     rg::font::Font font{"/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Bold.ttf", 36};
 };

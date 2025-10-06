@@ -26,10 +26,10 @@ void Drawing::world() const
     ray_casting_depth(sc, sc_map, player);
 }
 
-void Drawing::fps(const float dt) const
+void Drawing::fps(const float dt)
 {
-    const auto render = font.render(rl::TextFormat("%.1f", 1.0f / dt), settings->red);
-    sc->Blit(&render, settings->fps_pos);
+    fps_text_surface = font.render(rl::TextFormat("%.1f", 1.0f / dt), settings->red);
+    sc->Blit(&fps_text_surface, settings->fps_pos);
 }
 
 void Drawing::mini_map() const
