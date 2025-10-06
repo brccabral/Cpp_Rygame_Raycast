@@ -54,5 +54,4 @@ void Player::movement(const float dt, rg::Surface *sc)
     {
         angle += rotation_speed * dt;
     }
-
 }

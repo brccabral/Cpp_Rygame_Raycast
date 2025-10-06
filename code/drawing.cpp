@@ -22,8 +22,8 @@ void Drawing::background() const
 
 void Drawing::world() const
 {
-    // ray_casting_distance(sc, sc_map, player);
-    ray_casting_depth(sc, sc_map, player);
+    // ray_casting_distance(sc, sc_map, player, settings);
+    ray_casting_depth(sc, sc_map, player, settings);
 }
 
 void Drawing::fps(const float dt)

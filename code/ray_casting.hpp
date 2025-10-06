@@ -12,5 +12,7 @@ rg::math::Vector2<int> mapping(N a, N b)
     return {xi, yi};
 }
 
-void ray_casting_distance(rg::Surface *sc, rg::Surface *sc_map, Player *player);
-void ray_casting_depth(rg::Surface *sc, rg::Surface *sc_map, Player *player);
+void ray_casting_distance(
+        rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings);
+void ray_casting_depth(
+        rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings);

@@ -4,15 +4,16 @@
 #include "settings.hpp"
 
 
-void ray_casting_distance(rg::Surface *sc, rg::Surface *sc_map, Player *player)
+void ray_casting_distance(
+        rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings)
 {
-    auto cur_angle = player->angle - Settings::GetInstance()->half_fov;
+    auto cur_angle = player->angle - settings->half_fov;
     auto [xo, yo] = player->pos();
-    for (int ray = 0; ray < Settings::GetInstance()->num_rays; ++ray)
+    for (int ray = 0; ray < settings->num_rays; ++ray)
     {
         const auto sin_a = sinf(cur_angle);
         const auto cos_a = cosf(cur_angle);
-        for (int depth = 0; depth < Settings::GetInstance()->max_depth; ++depth)
+        for (int depth = 0; depth < settings->max_depth; ++depth)
         {
             auto x = xo + depth * cos_a;
             auto y = yo + depth * sin_a;
@@ -22,42 +23,43 @@ void ray_casting_distance(rg::Surface *sc, rg::Surface *sc_map, Player *player)
             {
                 // show ray line when they hit a wall
                 rg::draw::line(
-                        sc_map, Settings::GetInstance()->raycolor, player->pos_map(),
-                        {x / Settings::GetInstance()->map_scale,
-                         y / Settings::GetInstance()->map_scale}, 2);
+                        sc_map, settings->raycolor, player->pos_map(),
+                        {x / settings->map_scale,
+                         y / settings->map_scale}, 2);
                 // remove fish eye effect
                 depth *= cosf(player->angle - cur_angle);
-                auto proj_height = Settings::GetInstance()->proj_coeff / depth;
+                auto proj_height = settings->proj_coeff / depth;
                 // closer walls are brighter
                 const unsigned char c = 255 / (1 + depth * depth * 0.0001);
                 const auto color = rl::Color{c, static_cast<unsigned char>(c / 2),
                                              static_cast<unsigned char>(c / 3), 255};
                 rg::draw::rect(
                         sc, color, {
-                                static_cast<float>(ray * Settings::GetInstance()->scale),
-                                Settings::GetInstance()->half_height - proj_height / 2.0f,
-                                static_cast<float>(Settings::GetInstance()->scale),
+                                static_cast<float>(ray * settings->scale),
+                                settings->half_height - proj_height / 2.0f,
+                                static_cast<float>(settings->scale),
                                 proj_height
                         });
                 break;
             }
         }
-        cur_angle += Settings::GetInstance()->delta_angle;
+        cur_angle += settings->delta_angle;
     }
 }
 
-void ray_casting_depth(rg::Surface *sc, rg::Surface *sc_map, Player *player)
+void ray_casting_depth(
+        rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings)
 {
     auto [ox, oy] = player->pos();
     auto [xm, ym] = mapping(ox, oy);
-    auto cur_angle = player->angle - Settings::GetInstance()->half_fov;
+    auto cur_angle = player->angle - settings->half_fov;
     auto [ray_x, ray_y] = player->pos();
 
     int ray_x_v = xm, ray_x_h = xm;
     int ray_y_v = ym, ray_y_h = ym;
     float depth = 0, depth_v = 0, depth_h = 0;
 
-    for (int ray = 0; ray < Settings::GetInstance()->num_rays; ++ray)
+    for (int ray = 0; ray < settings->num_rays; ++ray)
     {
         const auto sin_a = sinf(cur_angle);
         const auto cos_a = cosf(cur_angle);
@@ -65,9 +67,9 @@ void ray_casting_depth(rg::Surface *sc, rg::Surface *sc_map, Player *player)
         // vertical hits
         // scan to the right if cos_a greater than 0
         auto [x, dx] = cos_a >= 0
-                           ? rg::math::Vector2{xm + Settings::GetInstance()->tile, 1}
+                           ? rg::math::Vector2{xm + settings->tile, 1}
                            : rg::math::Vector2{xm, -1};
-        for (int i = 0; i < Settings::GetInstance()->width; i += Settings::GetInstance()->tile)
+        for (int i = 0; i < settings->width; i += settings->tile)
         {
             depth_v = (x - ox) / cos_a;
             const auto depth_y = oy + depth_v * sin_a;
@@ -79,14 +81,14 @@ void ray_casting_depth(rg::Surface *sc, rg::Surface *sc_map, Player *player)
                 ray_y_v = depth_y;
                 break;
             }
-            x += dx * Settings::GetInstance()->tile;
+            x += dx * settings->tile;
         }
 
         // horizontal hits
         auto [y, dy] = sin_a >= 0
-                           ? rg::math::Vector2{ym + Settings::GetInstance()->tile, 1}
+                           ? rg::math::Vector2{ym + settings->tile, 1}
                            : rg::math::Vector2{ym, -1};
-        for (int i = 0; i < Settings::GetInstance()->height; i += Settings::GetInstance()->tile)
+        for (int i = 0; i < settings->height; i += settings->tile)
         {
             depth_h = (y - oy) / sin_a;
             const auto depth_x = ox + depth_h * cos_a;
@@ -98,7 +100,7 @@ void ray_casting_depth(rg::Surface *sc, rg::Surface *sc_map, Player *player)
                 ray_y_h = y;
                 break;
             }
-            y += dy * Settings::GetInstance()->tile;
+            y += dy * settings->tile;
         }
 
         // projection
@@ -117,24 +119,24 @@ void ray_casting_depth(rg::Surface *sc, rg::Surface *sc_map, Player *player)
 
         // show only rays when they hit wall
         rg::draw::line(
-                sc_map, Settings::GetInstance()->raycolor, player->pos_map(),
-                {ray_x / Settings::GetInstance()->map_scale,
-                 ray_y / Settings::GetInstance()->map_scale}, 2);
+                sc_map, settings->raycolor, player->pos_map(),
+                {ray_x / settings->map_scale,
+                 ray_y / settings->map_scale}, 2);
         // remove fish eye effect
         depth *= cosf(player->angle - cur_angle);
         // project wall
-        auto proj_height = Settings::GetInstance()->proj_coeff / depth;
+        auto proj_height = settings->proj_coeff / depth;
         // closer walls are brighter
         const unsigned char c = 255 / (1 + depth * depth * 0.0001);
         const auto color = rl::Color{c, static_cast<unsigned char>(c / 2),
                                      static_cast<unsigned char>(c / 3), 255};
         rg::draw::rect(
                 sc, color, {
-                        static_cast<float>(ray * Settings::GetInstance()->scale),
-                        Settings::GetInstance()->half_height - proj_height / 2.0f,
-                        static_cast<float>(Settings::GetInstance()->scale),
+                        static_cast<float>(ray * settings->scale),
+                        settings->half_height - proj_height / 2.0f,
+                        static_cast<float>(settings->scale),
                         proj_height
                 });
-        cur_angle += Settings::GetInstance()->delta_angle;
+        cur_angle += settings->delta_angle;
     }
 }
