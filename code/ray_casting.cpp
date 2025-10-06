@@ -18,8 +18,7 @@ void ray_casting_distance(
             auto x = xo + depth * cos_a;
             auto y = yo + depth * sin_a;
             // stop ray casting if ray touches a wall
-            if (MapLevels::GetInstance()->world_map.find(mapping(x, y)) !=
-                MapLevels::GetInstance()->world_map.end())
+            if (MapLevels::GetInstance()->world_map.contains(mapping(x, y)))
             {
                 // show ray line when they hit a wall
                 rg::draw::line(
@@ -74,8 +73,7 @@ void ray_casting_depth(
             depth_v = (x - ox) / cos_a;
             const auto depth_y = oy + depth_v * sin_a;
             auto loc = mapping(static_cast<float>(x + dx), depth_y);
-            if (MapLevels::GetInstance()->world_map.find(loc) !=
-                MapLevels::GetInstance()->world_map.end())
+            if (MapLevels::GetInstance()->world_map.contains(loc))
             {
                 ray_x_v = x;
                 ray_y_v = depth_y;
@@ -93,8 +91,7 @@ void ray_casting_depth(
             depth_h = (y - oy) / sin_a;
             const auto depth_x = ox + depth_h * cos_a;
             auto loc = mapping(depth_x, static_cast<float>(y + dy));
-            if (MapLevels::GetInstance()->world_map.find(loc) !=
-                MapLevels::GetInstance()->world_map.end())
+            if (MapLevels::GetInstance()->world_map.contains(loc))
             {
                 ray_x_h = depth_x;
                 ray_y_h = y;

@@ -1,5 +1,5 @@
 #pragma once
-#include "rygame.hpp"
+#include <rygame.hpp>
 
 
 class MapLevels
@@ -9,8 +9,8 @@ public:
     static MapLevels *GetInstance();
     static void Destroy();
 
-    rg::InsertOrderMap<rg::math::Vector2<int>, int> world_map{};
-    rg::InsertOrderMap<rg::math::Vector2<int>, int> mini_map{};
+    std::unordered_map<rg::math::Vector2<int>, int> world_map{};
+    std::unordered_map<rg::math::Vector2<int>, int> mini_map{};
 
 private:
 
