@@ -15,8 +15,7 @@ int main()
         const Settings *settings = Settings::GetInstance();
 
         auto *sc = &rg::display::SetMode(settings->width, settings->height);
-        auto sc_map = rg::Surface(
-                settings->width / settings->map_scale, settings->height / settings->map_scale);
+        auto sc_map = rg::Surface(settings->minimap_res.x, settings->minimap_res.y);
 
         float dt = 0;
 

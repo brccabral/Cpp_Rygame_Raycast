@@ -5,9 +5,9 @@ MapLevels *MapLevels::instance = nullptr;
 
 MapLevels::MapLevels()
 {
-    for (size_t r = 0; r < text_map.size(); ++r)
+    for (size_t r = 0; r < matrix_map.size(); ++r)
     {
-        auto row = text_map[r];
+        auto row = matrix_map[r];
         for (size_t c = 0; c < row.size(); ++c)
         {
             if (const auto mc = row[c]; mc != 0)

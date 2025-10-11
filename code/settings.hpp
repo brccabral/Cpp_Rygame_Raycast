@@ -12,6 +12,7 @@ public:
     int height = 800;
     int half_width = width / 2;
     int half_height = height / 2;
+    float penta_height = 5.0f * height;
     rl::Color white = {255, 255, 255, 255};
     rl::Color black = {0, 0, 0, 255};
     rl::Color blank = {0, 0, 0, 0};
@@ -42,9 +43,11 @@ public:
     rg::math::Vector2<float> fps_pos = {width - 100.0f, 5};
 
     // mini map
-    int map_scale = 5;
+    int minimap_scale = 5;
+    rg::math::Vector2<int> minimap_res = {width / minimap_scale, height / minimap_scale};
+    int map_scale = 2 * minimap_scale;
     int map_tile = tile / map_scale;
-    rg::math::Vector2<int> map_pos = {0, height - height / map_scale};
+    rg::math::Vector2<int> map_pos = {0, height - height / minimap_scale};
 
     // texture settings (1200 x 1200)
     int texture_width = 1200;

@@ -80,21 +80,21 @@ std::vector<SpriteObjectLocate> ray_casting_depth(
 
     float xh = 0, yv = 0, offset = 0;
 
+    int texture = 1;
+    int texture_v = 1;
+    int texture_h = 1;
+
     for (int ray = 0; ray < settings->num_rays; ++ray)
     {
         const auto sin_a = sinf(cur_angle);
         const auto cos_a = cosf(cur_angle);
-
-        int texture = 0;
-        int texture_v = 0;
-        int texture_h = 0;
 
         // vertical hits
         // scan to the right if cos_a greater than 0
         auto [x, dx] = cos_a >= 0
                            ? rg::math::Vector2{xm + settings->tile, 1}
                            : rg::math::Vector2{xm, -1};
-        for (int i = 0; i < settings->width; i += settings->tile)
+        for (int i = 0; i < MapLevels::GetInstance()->world_width; i += settings->tile)
         {
             depth_v = (x - ox) / cos_a;
             yv = oy + depth_v * sin_a;
@@ -113,7 +113,7 @@ std::vector<SpriteObjectLocate> ray_casting_depth(
         auto [y, dy] = sin_a >= 0
                            ? rg::math::Vector2{ym + settings->tile, 1}
                            : rg::math::Vector2{ym, -1};
-        for (int i = 0; i < settings->height; i += settings->tile)
+        for (int i = 0; i < MapLevels::GetInstance()->world_height; i += settings->tile)
         {
             depth_h = (y - oy) / sin_a;
             xh = ox + depth_h * cos_a;
@@ -156,7 +156,7 @@ std::vector<SpriteObjectLocate> ray_casting_depth(
         depth *= cosf(player->angle - cur_angle);
         depth = std::max(depth, 0.00001f);
         // project wall, limit rect height
-        auto proj_height = std::min(settings->proj_coeff / depth, 2.0f * settings->height);
+        auto proj_height = std::min(settings->proj_coeff / depth, settings->penta_height);
 
         walls.emplace_back(
                 depth, &(*textures)[texture],
