@@ -57,10 +57,15 @@ SpriteObjectLocate SpriteObject::object_locate(
 Sprites::Sprites()
 {
     sprite_types.emplace("barrel", rg::image::Load("resources/sprites/barrel/base/0.png"));
+    sprite_types.emplace("pedestal", rg::image::Load("resources/sprites/pedestal/base/0.png"));
 
     // image, static/animated, position, shift height, scale
     list_of_objects.emplace_back(
             &sprite_types["barrel"], true, rg::math::Vector2{7.1f, 2.1f}, 1.8f, 0.4f);
     list_of_objects.emplace_back(
             &sprite_types["barrel"], true, rg::math::Vector2{5.9f, 2.1f}, 1.8f, 0.4f);
+    list_of_objects.emplace_back(
+            &sprite_types["pedestal"], true, rg::math::Vector2{8.8f, 2.5f}, 1.6f, 0.5f);
+    list_of_objects.emplace_back(
+            &sprite_types["pedestal"], true, rg::math::Vector2{8.8f, 5.6f}, 1.6f, 0.5f);
 }
