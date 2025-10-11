@@ -26,19 +26,9 @@ SpriteObject::SpriteObject(
     current_object = &(*this->objects)[0];
 }
 
-SpriteObjectLocate SpriteObject::object_locate(
-        const Player *player, const Settings *settings,
-        const std::vector<SpriteObjectLocate> &walls)
+SpriteObjectLocate SpriteObject::object_locate(const Player *player)
 {
-    // increase rays on the sides to avoid a sprite disappearing when close to
-    // the border of the screen
-    std::vector fake_walls0(settings->fake_rays, walls[0]);
-    std::vector fake_walls1(settings->fake_rays, walls[walls.size() - 1]);
-    std::vector<SpriteObjectLocate> fake_walls;
-    fake_walls.reserve(fake_walls0.size() + walls.size() + fake_walls1.size());
-    fake_walls.insert(fake_walls.end(), fake_walls0.begin(), fake_walls0.end());
-    fake_walls.insert(fake_walls.end(), walls.begin(), walls.end());
-    fake_walls.insert(fake_walls.end(), fake_walls1.begin(), fake_walls1.end());
+    const Settings *settings = Settings::GetInstance();
 
     const auto dx = x - player->x;
     const auto dy = y - player->y;
@@ -63,13 +53,17 @@ SpriteObjectLocate SpriteObject::object_locate(
     // fix fish eye
     distance_to_sprite *= cosf(settings->half_fov - current_ray * settings->delta_angle);
 
+    // FAKE_RAYS_RANGE increase rays on the sides to avoid a
+    // sprite disappearing when close to the border of the screen
+    auto fake_ray = current_ray + settings->fake_rays;
     // check if sprite is inside "field of view" and
-    // if it is in front of wall
-    const int fake_ray = current_ray + settings->fake_rays;
-    if (0 <= fake_ray && fake_ray <= settings->num_rays - 1 + 2 * settings->fake_rays
-        && distance_to_sprite < fake_walls.at(fake_ray).depth)
+    // if it is more than 30 px of distance to avoid
+    // dropping frame rate when player is too close
+    // of a sprite, or a sprite is half-way behind a wall
+    if (0 <= fake_ray && fake_ray <= settings->fake_rays_range && distance_to_sprite > 30)
     {
-        const auto proj_height = int(settings->proj_coeff / distance_to_sprite * scale);
+        const auto proj_height = std::min(
+                int(settings->proj_coeff / distance_to_sprite * scale), settings->double_height);
         const auto half_proj_height = proj_height / 2;
         const auto sprite_shift = half_proj_height * shift;
 

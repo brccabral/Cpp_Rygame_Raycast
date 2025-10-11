@@ -43,7 +43,7 @@ int main()
             locates.insert(locates.end(), walls.begin(), walls.end());
             for (auto &obj: sprites.list_of_objects)
             {
-                locates.emplace_back(obj.object_locate(&player, settings, walls));
+                locates.emplace_back(obj.object_locate(&player));
             }
             drawing.world(locates);
             drawing.mini_map();

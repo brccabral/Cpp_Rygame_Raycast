@@ -13,9 +13,7 @@ public:
             std::vector<rg::Surface> *objects, bool is_static, rg::math::Vector2<float> pos,
             float shift, float scale);
 
-    SpriteObjectLocate object_locate(
-            const Player *player, const Settings *settings,
-            const std::vector<SpriteObjectLocate> &walls);
+    SpriteObjectLocate object_locate(const Player *player);
 
 private:
 

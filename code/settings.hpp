@@ -13,6 +13,7 @@ public:
     int half_width = width / 2;
     int half_height = height / 2;
     float penta_height = 5.0f * height;
+    int double_height = 2 * height;
     rl::Color white = {255, 255, 255, 255};
     rl::Color black = {0, 0, 0, 255};
     rl::Color blank = {0, 0, 0, 0};
@@ -58,6 +59,7 @@ public:
     float double_pi = 2 * M_PI;
     int center_ray = num_rays / 2 - 1;
     int fake_rays = 100;
+    int fake_rays_range = num_rays - 1 + 2 * fake_rays;
 
 private:
 
