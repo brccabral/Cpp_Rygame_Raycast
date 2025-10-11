@@ -7,7 +7,9 @@ Player::Player(
         const rg::math::Vector2<float> &pos, const float angle, const int speed,
         const float rotation_speed, const float mouse_sensitivity)
     : x(pos.x), y(pos.y), angle(angle), speed(speed), rotation_speed(rotation_speed),
-      mouse_sensitivity(mouse_sensitivity), settings(Settings::GetInstance())
+      mouse_sensitivity(mouse_sensitivity), settings(Settings::GetInstance()),
+      map_levels(MapLevels::GetInstance()),
+      rect(x, y, side, side)
 {
 }
 
@@ -26,6 +28,8 @@ void Player::movement(const float dt)
     keys_control(dt);
     mouse_control(dt);
 
+    rect.centerx(x).centery(y);
+
     // angle %= double_pi (modulo)
     angle += settings->double_pi;
     const auto div = angle / settings->double_pi;
@@ -37,25 +41,31 @@ void Player::keys_control(const float dt)
     const auto sin_a = sinf(angle);
     const auto cos_a = cosf(angle);
 
+    float dx{}, dy{};
+
     if (rl::IsKeyDown(rl::KEY_W))
     {
-        x += speed * dt * cos_a;
-        y += speed * dt * sin_a;
+        dx = speed * dt * cos_a;
+        dy = speed * dt * sin_a;
+        detect_collision(dx, dy);
     }
     if (rl::IsKeyDown(rl::KEY_S))
     {
-        x -= speed * dt * cos_a;
-        y -= speed * dt * sin_a;
+        dx = -speed * dt * cos_a;
+        dy = -speed * dt * sin_a;
+        detect_collision(dx, dy);
     }
     if (rl::IsKeyDown(rl::KEY_A))
     {
-        x += speed * dt * sin_a;
-        y -= speed * dt * cos_a;
+        dx = speed * dt * sin_a;
+        dy = -speed * dt * cos_a;
+        detect_collision(dx, dy);
     }
     if (rl::IsKeyDown(rl::KEY_D))
     {
-        x -= speed * dt * sin_a;
-        y += speed * dt * cos_a;
+        dx = -speed * dt * sin_a;
+        dy = speed * dt * cos_a;
+        detect_collision(dx, dy);
     }
     if (rl::IsKeyDown(rl::KEY_LEFT))
     {
@@ -75,4 +85,52 @@ void Player::mouse_control(const float dt)
     // have the same reference at all passes
     rl::SetMousePosition(settings->half_width, settings->half_height);
     angle += difference * mouse_sensitivity * dt;
+}
+
+void Player::detect_collision(float dx, float dy)
+{
+    auto next_rect = rect.copy();
+    next_rect.move_ip(dx, dy);
+    const auto hit_indexes = next_rect.collidelistall(map_levels->collision_walls);
+
+    if (!hit_indexes.empty())
+    {
+        float delta_x{}, delta_y{};
+        for (const auto &hit_index: hit_indexes)
+        {
+            auto &hit_rect = map_levels->collision_walls[hit_index];
+            if (dx > 0)
+            {
+                delta_x += next_rect.right() - hit_rect.left();
+            }
+            else
+            {
+                delta_x += hit_rect.right() - next_rect.left();
+            }
+            if (dy > 0)
+            {
+                delta_y += next_rect.bottom() - hit_rect.top();
+            }
+            else
+            {
+                delta_y += hit_rect.bottom() - next_rect.top();
+            }
+        }
+        if (fabsf(delta_x - delta_y) < 10)
+        {
+            dx = 0;
+            dy = 0;
+        }
+        else if (delta_x > delta_y)
+        {
+            dy = 0;
+        }
+        else if (delta_y > delta_x)
+        {
+            dx = 0;
+        }
+    }
+
+    x += dx;
+    y += dy;
 }

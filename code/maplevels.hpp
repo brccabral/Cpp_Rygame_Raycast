@@ -14,6 +14,7 @@ public:
 
     std::unordered_map<rg::math::Vector2<int>, int> world_map{};
     std::unordered_map<rg::math::Vector2<int>, int> mini_map{};
+    std::vector<rg::Rect> collision_walls{};
 
 private:
 
