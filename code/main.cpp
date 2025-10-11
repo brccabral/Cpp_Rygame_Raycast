@@ -36,7 +36,7 @@ int main()
             sc->Fill(settings->black);
 
             drawing.background();
-            auto walls = ray_casting_depth(&sc_map, &player, settings, &drawing.textures);
+            auto walls = ray_casting_depth(&sc_map, &player, &drawing.textures);
             static std::vector<SpriteObjectLocate> locates;
             locates.clear();
             locates.reserve(walls.size() + sprites.list_of_objects.size());

@@ -33,13 +33,17 @@ void Drawing::world(std::vector<SpriteObjectLocate> &locates) const
             {
                 return locate1.depth > locate2.depth;
             });
-    for (const auto &locate: locates)
+    for (const auto &[depth,
+             sprite,
+             sprite_dimension,
+             sprite_pos,
+             sprite_area]: locates)
     {
-        if (locate.depth)
+        if (depth)
         {
             sc->Blit(
-                    locate.sprite, locate.sprite_pos, locate.sprite_area, rl::BLEND_ALPHA,
-                    locate.sprite_dimension.x, locate.sprite_dimension.y);
+                    sprite, sprite_pos, sprite_area, rl::BLEND_ALPHA,
+                    sprite_dimension.x, sprite_dimension.y);
         }
     }
 }

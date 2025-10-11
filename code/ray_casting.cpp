@@ -5,9 +5,12 @@
 
 
 void ray_casting_distance(
-        rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings,
+        rg::Surface *sc, rg::Surface *sc_map, const Player *player,
         std::unordered_map<int, rg::Surface> *textures)
 {
+    const Settings *settings = Settings::GetInstance();
+    const MapLevels *map_levels = MapLevels::GetInstance();
+
     auto cur_angle = player->angle - settings->half_fov;
     auto [xo, yo] = player->pos();
     for (int ray = 0; ray < settings->num_rays; ++ray)
@@ -17,10 +20,10 @@ void ray_casting_distance(
         float depth = 0;
         for (int d = 0; d < settings->max_depth; depth += 1.0f, d = depth)
         {
-            auto x = xo + depth * cos_a;
-            auto y = yo + depth * sin_a;
+            const auto x = xo + depth * cos_a;
+            const auto y = yo + depth * sin_a;
             // stop ray casting if ray touches a wall
-            if (MapLevels::GetInstance()->world_map.contains(mapping(x, y)))
+            if (map_levels->world_map.contains(mapping(x, y)))
             {
                 // show ray line when they hit a wall
                 rg::draw::line(
@@ -30,22 +33,22 @@ void ray_casting_distance(
                 // remove fish eye effect
                 depth *= cosf(player->angle - cur_angle);
                 depth = std::max(depth, 0.00001f);
-                auto proj_height = settings->proj_coeff / depth;
+                const auto proj_height = settings->proj_coeff / depth;
 
                 auto [xm, ym] = mapping(x, y);
-                auto dif_x = cos_a >= 0 ? x - xm : settings->tile - (x - xm);
-                auto dif_y = sin_a >= 0 ? y - ym : settings->tile - (y - ym);
+                const auto dif_x = cos_a >= 0 ? x - xm : settings->tile - (x - xm);
+                const auto dif_y = sin_a >= 0 ? y - ym : settings->tile - (y - ym);
 
-                auto depth_v = (x - xo) / cos_a;
+                const auto depth_v = (x - xo) / cos_a;
                 auto yv = yo + depth_v * sin_a;
 
-                auto depth_h = (y - yo) / sin_a;
+                const auto depth_h = (y - yo) / sin_a;
                 auto xh = xo + depth_h * cos_a;
 
                 auto offset = dif_x < dif_y ? yv : xh;
                 offset = int(offset) % settings->tile;
 
-                auto *texture = &textures->at(MapLevels::GetInstance()->world_map.at({xm, ym}));
+                auto *texture = &textures->at(map_levels->world_map.at({xm, ym}));
 
                 sc->Blit(
                         texture,
@@ -64,9 +67,11 @@ void ray_casting_distance(
 }
 
 std::vector<SpriteObjectLocate> ray_casting_depth(
-        rg::Surface *sc_map, const Player *player, const Settings *settings,
-        std::unordered_map<int, rg::Surface> *textures)
+        rg::Surface *sc_map, const Player *player, std::unordered_map<int, rg::Surface> *textures)
 {
+    const Settings *settings = Settings::GetInstance();
+    const MapLevels *map_levels = MapLevels::GetInstance();
+
     std::vector<SpriteObjectLocate> walls{};
 
     auto [ox, oy] = player->pos();
@@ -80,7 +85,7 @@ std::vector<SpriteObjectLocate> ray_casting_depth(
 
     float xh = 0, yv = 0, offset = 0;
 
-    int texture = 1;
+    int texture{};
     int texture_v = 1;
     int texture_h = 1;
 
@@ -94,16 +99,16 @@ std::vector<SpriteObjectLocate> ray_casting_depth(
         auto [x, dx] = cos_a >= 0
                            ? rg::math::Vector2{xm + settings->tile, 1}
                            : rg::math::Vector2{xm, -1};
-        for (int i = 0; i < MapLevels::GetInstance()->world_width; i += settings->tile)
+        for (int i = 0; i < map_levels->world_width; i += settings->tile)
         {
             depth_v = (x - ox) / cos_a;
             yv = oy + depth_v * sin_a;
             auto tile_v = mapping(static_cast<float>(x + dx), yv);
-            if (MapLevels::GetInstance()->world_map.contains(tile_v))
+            if (map_levels->world_map.contains(tile_v))
             {
                 ray_x_v = x;
                 ray_y_v = yv;
-                texture_v = MapLevels::GetInstance()->world_map.at(tile_v);
+                texture_v = map_levels->world_map.at(tile_v);
                 break;
             }
             x += dx * settings->tile;
@@ -113,16 +118,16 @@ std::vector<SpriteObjectLocate> ray_casting_depth(
         auto [y, dy] = sin_a >= 0
                            ? rg::math::Vector2{ym + settings->tile, 1}
                            : rg::math::Vector2{ym, -1};
-        for (int i = 0; i < MapLevels::GetInstance()->world_height; i += settings->tile)
+        for (int i = 0; i < map_levels->world_height; i += settings->tile)
         {
             depth_h = (y - oy) / sin_a;
             xh = ox + depth_h * cos_a;
             auto tile_h = mapping(xh, static_cast<float>(y + dy));
-            if (MapLevels::GetInstance()->world_map.contains(tile_h))
+            if (map_levels->world_map.contains(tile_h))
             {
                 ray_x_h = xh;
                 ray_y_h = y;
-                texture_h = MapLevels::GetInstance()->world_map.at(tile_h);
+                texture_h = map_levels->world_map.at(tile_h);
                 break;
             }
             y += dy * settings->tile;
@@ -156,7 +161,7 @@ std::vector<SpriteObjectLocate> ray_casting_depth(
         depth *= cosf(player->angle - cur_angle);
         depth = std::max(depth, 0.00001f);
         // project wall, limit rect height
-        auto proj_height = std::min(settings->proj_coeff / depth, settings->penta_height);
+        const auto proj_height = std::min(settings->proj_coeff / depth, settings->penta_height);
 
         walls.emplace_back(
                 depth, &(*textures)[texture],
