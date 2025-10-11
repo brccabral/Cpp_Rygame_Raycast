@@ -10,12 +10,12 @@ MapLevels::MapLevels()
         auto row = text_map[r];
         for (size_t c = 0; c < row.size(); ++c)
         {
-            if (const auto mc = row[c]; mc == 'W')
+            if (const auto mc = row[c]; mc != 0)
             {
                 world_map[{(int) c * Settings::GetInstance()->tile,
-                           (int) r * Settings::GetInstance()->tile}] = 1;
+                           (int) r * Settings::GetInstance()->tile}] = mc;
                 mini_map[{(int) c * Settings::GetInstance()->map_tile,
-                          (int) r * Settings::GetInstance()->map_tile}] = 1;
+                          (int) r * Settings::GetInstance()->map_tile}] = mc;
             }
         }
     }

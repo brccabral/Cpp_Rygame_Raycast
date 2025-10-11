@@ -6,6 +6,8 @@ Drawing::Drawing(rg::Surface *sc, rg::Surface *sc_map, Player *player)
     : sc(sc), sc_map(sc_map), settings(Settings::GetInstance()),
       map_levels(MapLevels::GetInstance()), player(player)
 {
+    textures[1] = rg::image::Load("resources/images/1.png");
+    textures[2] = rg::image::Load("resources/images/2.png");
 }
 
 void Drawing::background() const
@@ -22,8 +24,8 @@ void Drawing::background() const
 
 void Drawing::world()
 {
-    // ray_casting_distance(sc, sc_map, player, settings, &texture);
-    ray_casting_depth(sc, sc_map, player, settings, &texture);
+    // ray_casting_distance(sc, sc_map, player, settings, &textures);
+    ray_casting_depth(sc, sc_map, player, settings, &textures);
 }
 
 void Drawing::fps(const float dt)

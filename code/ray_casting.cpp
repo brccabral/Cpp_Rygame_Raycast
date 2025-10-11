@@ -6,7 +6,7 @@
 
 void ray_casting_distance(
         rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings,
-        rg::Surface *texture)
+        std::unordered_map<int, rg::Surface> *textures)
 {
     auto cur_angle = player->angle - settings->half_fov;
     auto [xo, yo] = player->pos();
@@ -45,6 +45,8 @@ void ray_casting_distance(
                 auto offset = dif_x < dif_y ? yv : xh;
                 offset = int(offset) % settings->tile;
 
+                auto *texture = &textures->at(MapLevels::GetInstance()->world_map.at({xm, ym}));
+
                 sc->Blit(
                         texture,
                         rg::math::Vector2
@@ -63,7 +65,7 @@ void ray_casting_distance(
 
 void ray_casting_depth(
         rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings,
-        rg::Surface *texture)
+        std::unordered_map<int, rg::Surface> *textures)
 {
     auto [ox, oy] = player->pos();
     auto [xm, ym] = mapping(ox, oy);
@@ -81,6 +83,10 @@ void ray_casting_depth(
         const auto sin_a = sinf(cur_angle);
         const auto cos_a = cosf(cur_angle);
 
+        int texture = 0;
+        int texture_v = 0;
+        int texture_h = 0;
+
         // vertical hits
         // scan to the right if cos_a greater than 0
         auto [x, dx] = cos_a >= 0
@@ -90,11 +96,12 @@ void ray_casting_depth(
         {
             depth_v = (x - ox) / cos_a;
             yv = oy + depth_v * sin_a;
-            auto loc = mapping(static_cast<float>(x + dx), yv);
-            if (MapLevels::GetInstance()->world_map.contains(loc))
+            auto tile_v = mapping(static_cast<float>(x + dx), yv);
+            if (MapLevels::GetInstance()->world_map.contains(tile_v))
             {
                 ray_x_v = x;
                 ray_y_v = yv;
+                texture_v = MapLevels::GetInstance()->world_map.at(tile_v);
                 break;
             }
             x += dx * settings->tile;
@@ -108,11 +115,12 @@ void ray_casting_depth(
         {
             depth_h = (y - oy) / sin_a;
             xh = ox + depth_h * cos_a;
-            auto loc = mapping(xh, static_cast<float>(y + dy));
-            if (MapLevels::GetInstance()->world_map.contains(loc))
+            auto tile_h = mapping(xh, static_cast<float>(y + dy));
+            if (MapLevels::GetInstance()->world_map.contains(tile_h))
             {
                 ray_x_h = xh;
                 ray_y_h = y;
+                texture_h = MapLevels::GetInstance()->world_map.at(tile_h);
                 break;
             }
             y += dy * settings->tile;
@@ -125,6 +133,7 @@ void ray_casting_depth(
             ray_x = ray_x_v;
             ray_y = ray_y_v;
             offset = yv;
+            texture = texture_v;
         }
         else
         {
@@ -132,6 +141,7 @@ void ray_casting_depth(
             ray_x = ray_x_h;
             ray_y = ray_y_h;
             offset = xh;
+            texture = texture_h;
         }
         offset = int(offset) % settings->tile;
 
@@ -147,8 +157,10 @@ void ray_casting_depth(
         auto proj_height = std::min(settings->proj_coeff / depth, 2.0f * settings->height);
 
         sc->Blit(
-                texture, rg::math::Vector2{ray * settings->scale,
-                                           settings->half_height - int(proj_height / 2)}, {
+                &(*textures)[texture],
+                rg::math::Vector2{ray * settings->scale,
+                                  settings->half_height - int(proj_height / 2)},
+                {
                         offset * settings->scale, 0.0f, static_cast<float>(settings->scale),
                         static_cast<float>(settings->texture_height)}, rl::BLEND_ALPHA,
                 settings->scale, proj_height);

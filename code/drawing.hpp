@@ -23,5 +23,5 @@ public:
     Player *player;
     rg::Surface fps_text_surface{};
     rg::font::Font font{"/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Bold.ttf", 36};
-    rg::Surface texture = rg::image::Load("resources/images/1.png");
+    std::unordered_map<int, rg::Surface> textures;
 };
