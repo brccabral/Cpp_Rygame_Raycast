@@ -20,12 +20,13 @@ int main()
         rl::HideCursor();
         float dt = 0;
 
+        Sprites sprites{};
         auto player = Player(
+                &sprites,
                 {static_cast<float>(settings->half_width) / 4,
                  static_cast<float>(settings->half_height) - 50.0f},
                 0.f, 120, 1.2f, 0.3f);
         auto drawing = Drawing(sc, &sc_map, &player);
-        Sprites sprites{};
 
         while (!rg::WindowCloseOrQuit())
         {

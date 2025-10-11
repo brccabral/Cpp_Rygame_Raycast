@@ -1,16 +1,18 @@
 #pragma once
+#include <rygame.hpp>
 #include "maplevels.hpp"
-#include "rygame.hpp"
 #include "settings.hpp"
 
+
+class Sprites;
 
 class Player
 {
 public:
 
     Player(
-            const rg::math::Vector2<float> &pos, float angle, int speed, float rotation_speed,
-            float mouse_sensitivity);
+            Sprites *sprites, const rg::math::Vector2<float> &pos, float angle, int speed,
+            float rotation_speed, float mouse_sensitivity);
     ~Player() = default;
 
     [[nodiscard]] rg::math::Vector2<float> pos() const;
@@ -33,5 +35,8 @@ private:
     void keys_control(float dt);
     void mouse_control(float dt);
     void detect_collision(float dx, float dy);
+
+    Sprites *sprites{};
+    std::vector<rg::Rect> collision_list{};
 
 };

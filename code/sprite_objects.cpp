@@ -1,12 +1,14 @@
 #include "sprite_objects.hpp"
 
-SpriteObject::SpriteObject(SpriteParameter *parameter, rg::math::Vector2<float> pos)
+SpriteObject::SpriteObject(SpriteParameter *parameter, const rg::math::Vector2<float> pos)
     : pos(pos), parameter(parameter)
 {
+    blocked = parameter->blocked;
+
     x = pos.x * Settings::GetInstance()->tile;
     y = pos.y * Settings::GetInstance()->tile;
-    this->pos.x = x;
-    this->pos.y = y;
+    this->pos.x = x - side / 2;
+    this->pos.y = y - side / 2;
 
     object = &parameter->sprite[0];
 
@@ -122,6 +124,7 @@ Sprites::Sprites()
     }
     sprite_barrel_params.animation_dist = 800;
     sprite_barrel_params.animation_speed = 10;
+    sprite_barrel_params.blocked = true;
     sprite_parameters["sprite_barrel"] = std::move(sprite_barrel_params);
 
     SpriteParameter sprite_pin_params;

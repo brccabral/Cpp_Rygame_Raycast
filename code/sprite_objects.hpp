@@ -22,7 +22,7 @@ struct SpriteParameter
     int animation_dist{};
     // animation speed
     int animation_speed{};
-    // collision
+    // player collision
     bool blocked{};
 };
 
@@ -34,10 +34,13 @@ public:
 
     SpriteObjectLocate object_locate(const Player *player, float dt);
 
+    bool blocked{};
+    rg::math::Vector2<float> pos{};
+    float side = 30.0f;
+
 private:
 
     rg::Surface *object{};
-    rg::math::Vector2<float> pos{};
     float x{};
     float y{};
 

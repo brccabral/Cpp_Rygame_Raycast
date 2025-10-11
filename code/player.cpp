@@ -2,15 +2,26 @@
 
 #include "maplevels.hpp"
 #include "settings.hpp"
+#include "sprite_objects.hpp"
 
 Player::Player(
-        const rg::math::Vector2<float> &pos, const float angle, const int speed,
+        Sprites *sprites, const rg::math::Vector2<float> &pos, const float angle, const int speed,
         const float rotation_speed, const float mouse_sensitivity)
     : x(pos.x), y(pos.y), angle(angle), speed(speed), rotation_speed(rotation_speed),
       mouse_sensitivity(mouse_sensitivity), settings(Settings::GetInstance()),
-      map_levels(MapLevels::GetInstance()),
-      rect(x, y, side, side)
+      map_levels(MapLevels::GetInstance()), rect(x, y, side, side), sprites(sprites)
 {
+    collision_list.reserve(sprites->list_of_objects.size() + map_levels->collision_walls.size());
+    for (auto &object: sprites->list_of_objects)
+    {
+        if (object.blocked)
+        {
+            collision_list.emplace_back(object.pos.x, object.pos.y, object.side, object.side);
+        }
+    }
+    collision_list.insert(
+            collision_list.end(), map_levels->collision_walls.begin(),
+            map_levels->collision_walls.end());
 }
 
 rg::math::Vector2<float> Player::pos() const
@@ -91,14 +102,14 @@ void Player::detect_collision(float dx, float dy)
 {
     auto next_rect = rect.copy();
     next_rect.move_ip(dx, dy);
-    const auto hit_indexes = next_rect.collidelistall(map_levels->collision_walls);
+    const auto hit_indexes = next_rect.collidelistall(collision_list);
 
     if (!hit_indexes.empty())
     {
         float delta_x{}, delta_y{};
         for (const auto &hit_index: hit_indexes)
         {
-            auto &hit_rect = map_levels->collision_walls[hit_index];
+            auto &hit_rect = collision_list[hit_index];
             if (dx > 0)
             {
                 delta_x += next_rect.right() - hit_rect.left();
