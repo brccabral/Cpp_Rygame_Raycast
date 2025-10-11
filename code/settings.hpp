@@ -33,7 +33,7 @@ public:
 
     // projection
     float dist = num_rays / (2 * tanf(half_fov));
-    float proj_coeff = dist * tile;
+    float proj_coeff = 3 * dist * tile;
     int scale = width / num_rays;
 
     rg::math::Vector2<float> fps_pos = {width - 100.0f, 5};

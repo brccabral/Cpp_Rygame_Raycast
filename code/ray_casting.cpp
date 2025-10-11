@@ -13,7 +13,8 @@ void ray_casting_distance(
     {
         const auto sin_a = sinf(cur_angle);
         const auto cos_a = cosf(cur_angle);
-        for (int depth = 0; depth < settings->max_depth; ++depth)
+        float depth = 0;
+        for (int d = 0; d < settings->max_depth; depth += 1.0f, d = depth)
         {
             auto x = xo + depth * cos_a;
             auto y = yo + depth * sin_a;
@@ -27,6 +28,7 @@ void ray_casting_distance(
                          y / settings->map_scale}, 2);
                 // remove fish eye effect
                 depth *= cosf(player->angle - cur_angle);
+                depth = std::max(depth, 0.00001f);
                 auto proj_height = settings->proj_coeff / depth;
                 // closer walls are brighter
                 const unsigned char c = 255 / (1 + depth * depth * 0.0001);
@@ -121,8 +123,9 @@ void ray_casting_depth(
                  ray_y / settings->map_scale}, 2);
         // remove fish eye effect
         depth *= cosf(player->angle - cur_angle);
-        // project wall
-        auto proj_height = settings->proj_coeff / depth;
+        depth = std::max(depth, 0.00001f);
+        // project wall, limit rect height
+        auto proj_height = std::min(settings->proj_coeff / depth, 2.0f * settings->height);
         // closer walls are brighter
         const unsigned char c = 255 / (1 + depth * depth * 0.0001);
         const auto color = rl::Color{c, static_cast<unsigned char>(c / 2),
