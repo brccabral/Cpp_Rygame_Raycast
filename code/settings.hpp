@@ -43,6 +43,11 @@ public:
     int map_tile = tile / map_scale;
     rg::math::Vector2<int> map_pos = {0, height - height / map_scale};
 
+    // texture settings (1200 x 1200)
+    int texture_width = 1200;
+    int texture_height = 1200;
+    int texture_scale = texture_width / tile;
+
 private:
 
     Settings() = default;

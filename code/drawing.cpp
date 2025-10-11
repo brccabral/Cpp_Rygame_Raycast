@@ -20,10 +20,10 @@ void Drawing::background() const
     sc_map->Fill(settings->black);
 }
 
-void Drawing::world() const
+void Drawing::world()
 {
-    // ray_casting_distance(sc, sc_map, player, settings);
-    ray_casting_depth(sc, sc_map, player, settings);
+    // ray_casting_distance(sc, sc_map, player, settings, &texture);
+    ray_casting_depth(sc, sc_map, player, settings, &texture);
 }
 
 void Drawing::fps(const float dt)

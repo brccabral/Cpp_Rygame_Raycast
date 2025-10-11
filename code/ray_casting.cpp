@@ -5,7 +5,8 @@
 
 
 void ray_casting_distance(
-        rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings)
+        rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings,
+        rg::Surface *texture)
 {
     auto cur_angle = player->angle - settings->half_fov;
     auto [xo, yo] = player->pos();
@@ -30,17 +31,29 @@ void ray_casting_distance(
                 depth *= cosf(player->angle - cur_angle);
                 depth = std::max(depth, 0.00001f);
                 auto proj_height = settings->proj_coeff / depth;
-                // closer walls are brighter
-                const unsigned char c = 255 / (1 + depth * depth * 0.0001);
-                const auto color = rl::Color{c, static_cast<unsigned char>(c / 2),
-                                             static_cast<unsigned char>(c / 3), 255};
-                rg::draw::rect(
-                        sc, color, {
-                                static_cast<float>(ray * settings->scale),
-                                settings->half_height - proj_height / 2.0f,
-                                static_cast<float>(settings->scale),
-                                proj_height
-                        });
+
+                auto [xm, ym] = mapping(x, y);
+                auto dif_x = cos_a >= 0 ? x - xm : settings->tile - (x - xm);
+                auto dif_y = sin_a >= 0 ? y - ym : settings->tile - (y - ym);
+
+                auto depth_v = (x - xo) / cos_a;
+                auto yv = yo + depth_v * sin_a;
+
+                auto depth_h = (y - yo) / sin_a;
+                auto xh = xo + depth_h * cos_a;
+
+                auto offset = dif_x < dif_y ? yv : xh;
+                offset = int(offset) % settings->tile;
+
+                sc->Blit(
+                        texture,
+                        rg::math::Vector2
+                        {ray * settings->scale, settings->half_height - int(proj_height / 2)},
+                        {offset * settings->texture_scale, 0.0f,
+                         static_cast<float>(settings->texture_scale),
+                         static_cast<float>(settings->texture_height)}, rl::BLEND_ALPHA,
+                        settings->scale, proj_height);
+
                 break;
             }
         }
@@ -49,7 +62,8 @@ void ray_casting_distance(
 }
 
 void ray_casting_depth(
-        rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings)
+        rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings,
+        rg::Surface *texture)
 {
     auto [ox, oy] = player->pos();
     auto [xm, ym] = mapping(ox, oy);
@@ -59,6 +73,8 @@ void ray_casting_depth(
     int ray_x_v = xm, ray_x_h = xm;
     int ray_y_v = ym, ray_y_h = ym;
     float depth = 0, depth_v = 0, depth_h = 0;
+
+    float xh = 0, yv = 0, offset = 0;
 
     for (int ray = 0; ray < settings->num_rays; ++ray)
     {
@@ -73,12 +89,12 @@ void ray_casting_depth(
         for (int i = 0; i < settings->width; i += settings->tile)
         {
             depth_v = (x - ox) / cos_a;
-            const auto depth_y = oy + depth_v * sin_a;
-            auto loc = mapping(static_cast<float>(x + dx), depth_y);
+            yv = oy + depth_v * sin_a;
+            auto loc = mapping(static_cast<float>(x + dx), yv);
             if (MapLevels::GetInstance()->world_map.contains(loc))
             {
                 ray_x_v = x;
-                ray_y_v = depth_y;
+                ray_y_v = yv;
                 break;
             }
             x += dx * settings->tile;
@@ -91,11 +107,11 @@ void ray_casting_depth(
         for (int i = 0; i < settings->height; i += settings->tile)
         {
             depth_h = (y - oy) / sin_a;
-            const auto depth_x = ox + depth_h * cos_a;
-            auto loc = mapping(depth_x, static_cast<float>(y + dy));
+            xh = ox + depth_h * cos_a;
+            auto loc = mapping(xh, static_cast<float>(y + dy));
             if (MapLevels::GetInstance()->world_map.contains(loc))
             {
-                ray_x_h = depth_x;
+                ray_x_h = xh;
                 ray_y_h = y;
                 break;
             }
@@ -108,13 +124,16 @@ void ray_casting_depth(
             depth = depth_v;
             ray_x = ray_x_v;
             ray_y = ray_y_v;
+            offset = yv;
         }
         else
         {
             depth = depth_h;
             ray_x = ray_x_h;
             ray_y = ray_y_h;
+            offset = xh;
         }
+        offset = int(offset) % settings->tile;
 
         // show only rays when they hit wall
         rg::draw::line(
@@ -126,17 +145,15 @@ void ray_casting_depth(
         depth = std::max(depth, 0.00001f);
         // project wall, limit rect height
         auto proj_height = std::min(settings->proj_coeff / depth, 2.0f * settings->height);
-        // closer walls are brighter
-        const unsigned char c = 255 / (1 + depth * depth * 0.0001);
-        const auto color = rl::Color{c, static_cast<unsigned char>(c / 2),
-                                     static_cast<unsigned char>(c / 3), 255};
-        rg::draw::rect(
-                sc, color, {
-                        static_cast<float>(ray * settings->scale),
-                        settings->half_height - proj_height / 2.0f,
-                        static_cast<float>(settings->scale),
-                        proj_height
-                });
+
+        sc->Blit(
+                texture, rg::math::Vector2{ray * settings->scale,
+                                           settings->half_height - int(proj_height / 2)}, {
+                        offset * settings->scale, 0.0f, static_cast<float>(settings->scale),
+                        static_cast<float>(settings->texture_height)}, rl::BLEND_ALPHA,
+                settings->scale, proj_height);
+
         cur_angle += settings->delta_angle;
     }
+
 }
