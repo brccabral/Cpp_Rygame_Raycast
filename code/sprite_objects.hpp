@@ -50,6 +50,8 @@ private:
     // min/max
     std::vector<rg::math::Vector2<int>> sprite_angles{};
     std::unordered_map<rg::math::Vector2<int>, rg::Surface *> sprite_positions{};
+
+    Settings *settings;
 };
 
 class Sprites

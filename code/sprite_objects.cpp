@@ -1,12 +1,12 @@
 #include "sprite_objects.hpp"
 
 SpriteObject::SpriteObject(SpriteParameter *parameter, const rg::math::Vector2<float> pos)
-    : pos(pos), parameter(parameter)
+    : pos(pos), parameter(parameter), settings(Settings::GetInstance())
 {
     blocked = parameter->blocked;
 
-    x = pos.x * Settings::GetInstance()->tile;
-    y = pos.y * Settings::GetInstance()->tile;
+    x = pos.x * settings->tile;
+    y = pos.y * settings->tile;
     this->pos.x = x - side / 2;
     this->pos.y = y - side / 2;
 
@@ -27,8 +27,6 @@ SpriteObject::SpriteObject(SpriteParameter *parameter, const rg::math::Vector2<f
 
 SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float dt)
 {
-    const Settings *settings = Settings::GetInstance();
-
     const auto dx = x - player->x;
     const auto dy = y - player->y;
     auto distance_to_sprite = std::sqrt(dx * dx + dy * dy);
