@@ -45,7 +45,7 @@ void Drawing::mini_map() const
     for (auto [x, y]: map_levels->mini_map | std::views::keys)
     {
         rg::draw::rect(
-                sc_map, settings->white, {x, y, settings->map_tile, settings->map_tile});
+                sc_map, settings->sandy, {x, y, settings->map_tile, settings->map_tile});
     }
 
     // player position

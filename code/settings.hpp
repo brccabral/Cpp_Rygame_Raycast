@@ -23,6 +23,7 @@ public:
     rl::Color skyblue = {0, 186, 255, 255};
     rl::Color raycolor = {220, 220, 0, 255};
     rl::Color yellow = {220, 220, 0, 255};
+    rl::Color sandy = {244, 164, 90, 255};
     int tile = 100;
 
     float fov = PI / 3.0f;
