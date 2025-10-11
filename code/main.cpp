@@ -41,7 +41,7 @@ int main()
             static std::vector<SpriteObjectLocate> locates;
             locates.clear();
             locates.reserve(walls.size() + sprites.list_of_objects.size());
-            locates.insert(locates.begin(), walls.begin(), walls.end());
+            locates.insert(locates.end(), walls.begin(), walls.end());
             for (auto &obj: sprites.list_of_objects)
             {
                 locates.emplace_back(obj.object_locate(&player, settings, walls));

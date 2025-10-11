@@ -54,6 +54,7 @@ public:
     // sprite settings
     float double_pi = 2 * M_PI;
     int center_ray = num_rays / 2 - 1;
+    int fake_rays = 100;
 
 private:
 

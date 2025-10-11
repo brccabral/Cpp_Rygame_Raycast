@@ -30,6 +30,16 @@ SpriteObjectLocate SpriteObject::object_locate(
         const Player *player, const Settings *settings,
         const std::vector<SpriteObjectLocate> &walls)
 {
+    // increase rays on the sides to avoid a sprite disappearing when close to
+    // the border of the screen
+    std::vector fake_walls0(settings->fake_rays, walls[0]);
+    std::vector fake_walls1(settings->fake_rays, walls[walls.size() - 1]);
+    std::vector<SpriteObjectLocate> fake_walls;
+    fake_walls.reserve(fake_walls0.size() + walls.size() + fake_walls1.size());
+    fake_walls.insert(fake_walls.end(), fake_walls0.begin(), fake_walls0.end());
+    fake_walls.insert(fake_walls.end(), walls.begin(), walls.end());
+    fake_walls.insert(fake_walls.end(), fake_walls1.begin(), fake_walls1.end());
+
     const auto dx = x - player->x;
     const auto dy = y - player->y;
     auto distance_to_sprite = std::sqrt(dx * dx + dy * dy);
@@ -55,8 +65,9 @@ SpriteObjectLocate SpriteObject::object_locate(
 
     // check if sprite is inside "field of view" and
     // if it is in front of wall
-    if (0 <= current_ray && current_ray <= settings->num_rays - 1
-        && distance_to_sprite < walls.at(current_ray).depth)
+    const int fake_ray = current_ray + settings->fake_rays;
+    if (0 <= fake_ray && fake_ray <= settings->num_rays - 1 + 2 * settings->fake_rays
+        && distance_to_sprite < fake_walls.at(fake_ray).depth)
     {
         const auto proj_height = int(settings->proj_coeff / distance_to_sprite * scale);
         const auto half_proj_height = proj_height / 2;
