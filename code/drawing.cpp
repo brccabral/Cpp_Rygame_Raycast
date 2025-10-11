@@ -11,6 +11,16 @@ Drawing::Drawing(rg::Surface *sc, rg::Surface *sc_map, Player *player)
     textures[3] = rg::image::Load("resources/images/wall5.png");
     textures[4] = rg::image::Load("resources/images/wall6.png");
     sky_surface = rg::image::Load("resources/images/sky1.png");
+
+    weapon_base_sprite = rg::image::Load("resources/sprites/weapons/shotgun/base/0.png");
+    for (int i = 0; i < 20; ++i)
+    {
+        std::string path = "resources/sprites/weapons/shotgun/shot/" + std::to_string(i) + ".png";
+        weapon_shot_animation.emplace_back(rg::image::Load(path.c_str()));
+    }
+    weapon_rect = weapon_base_sprite.GetRect();
+    weapon_pos = {settings->half_width - weapon_rect.width / 2,
+                  settings->height - weapon_rect.height};
 }
 
 void Drawing::background()
@@ -76,4 +86,28 @@ void Drawing::mini_map() const
                     player_y_map + settings->width / settings->map_scale * sinf(player->angle)});
 
     sc->Blit(sc_map, settings->map_pos);
+}
+
+void Drawing::player_weapon(const float dt)
+{
+    if (player->shot)
+    {
+        weapon_sprite = &weapon_shot_animation[int(shot_animation_index)];
+        shot_animation_index += shot_animation_speed * dt;
+        if (shot_animation_index >= weapon_shot_animation.size())
+        {
+            shot_animation_index = 0;
+            player->shot = false;
+            shot_animation_trigger = true;
+        }
+        else
+        {
+            shot_animation_trigger = false;
+        }
+    }
+    else
+    {
+        weapon_sprite = &weapon_base_sprite;
+    }
+    sc->Blit(weapon_sprite, weapon_pos);
 }

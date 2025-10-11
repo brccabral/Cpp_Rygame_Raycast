@@ -32,6 +32,11 @@ int main()
         {
             dt = rl::GetFrameTime();
 
+            if (rl::IsMouseButtonPressed(rl::MOUSE_BUTTON_LEFT))
+            {
+                player.shoot();
+            }
+
             player.movement(dt);
 
             sc->Fill(settings->black);
@@ -48,6 +53,7 @@ int main()
             }
             drawing.world(locates);
             drawing.mini_map();
+            drawing.player_weapon(dt);
             drawing.fps(dt);
 
             rg::display::Update();

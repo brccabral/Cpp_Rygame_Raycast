@@ -47,6 +47,14 @@ void Player::movement(const float dt)
     angle = angle - int(div) * settings->double_pi;
 }
 
+void Player::shoot()
+{
+    if (!shot)
+    {
+        shot = true;
+    }
+}
+
 void Player::keys_control(const float dt)
 {
     const auto sin_a = sinf(angle);

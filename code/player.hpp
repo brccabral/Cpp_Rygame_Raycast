@@ -19,6 +19,8 @@ public:
     [[nodiscard]] rg::math::Vector2<float> pos_map() const;
     void movement(float dt);
 
+    void shoot();
+
     float x{};
     float y{};
     float angle{};
@@ -29,6 +31,9 @@ public:
     MapLevels *map_levels{};
     float side = 50;
     rg::Rect rect{x, y, side, side};
+
+    // weapon
+    bool shot{};
 
 private:
 
