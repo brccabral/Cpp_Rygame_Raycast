@@ -10,7 +10,7 @@ SpriteObject::SpriteObject(SpriteParameter *parameter, rg::math::Vector2<float> 
 
     object = &parameter->sprite[0];
 
-    if (!parameter->viewing_angles.empty())
+    if (!parameter->viewing_angles)
     {
         for (int i = 0; i < 360; i += 45)
         {
@@ -65,7 +65,7 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
         const auto half_proj_height = proj_height / 2;
         const auto sprite_shift = half_proj_height * parameter->shift;
 
-        if (!parameter->viewing_angles.empty())
+        if (!parameter->viewing_angles)
         {
             if (theta < 0)
             {
@@ -93,6 +93,10 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
             }
             object = &parameter->animation[int(animation_index)];
         }
+        else
+        {
+            object = &parameter->sprite[0];
+        }
 
         return {distance_to_sprite, object,
                 {static_cast<float>(proj_height), static_cast<float>(proj_height)},
@@ -108,7 +112,6 @@ Sprites::Sprites()
     SpriteParameter sprite_barrel_params;
     sprite_barrel_params.sprite.emplace_back(
             rg::image::Load("resources/sprites/barrel/base/0.png"));
-    sprite_barrel_params.viewing_angles = {};
     sprite_barrel_params.shift = 1.8f;
     sprite_barrel_params.scale = 0.4f;
     for (int i = 0; i < 13; ++i)
@@ -121,9 +124,63 @@ Sprites::Sprites()
     sprite_barrel_params.animation_speed = 10;
     sprite_parameters["sprite_barrel"] = std::move(sprite_barrel_params);
 
+    SpriteParameter sprite_pin_params;
+    sprite_pin_params.sprite.emplace_back(
+            rg::image::Load("resources/sprites/pin/base/0.png"));
+    sprite_pin_params.shift = 0.6f;
+    sprite_pin_params.scale = 0.6f;
+    for (int i = 0; i < 8; ++i)
+    {
+        std::string path = std::string("resources/sprites/pin/anim/") + std::to_string(i) +
+                           ".png";
+        sprite_pin_params.animation.emplace_back(rg::image::Load(path.c_str()));
+    }
+    sprite_pin_params.animation_dist = 800;
+    sprite_pin_params.animation_speed = 10;
+    sprite_pin_params.blocked = true;
+    sprite_parameters["sprite_pin"] = std::move(sprite_pin_params);
+
+    SpriteParameter sprite_devil_params;
+    sprite_devil_params.sprite.emplace_back(
+            rg::image::Load("resources/sprites/devil/base/0.png"));
+    sprite_devil_params.viewing_angles = true;
+    sprite_devil_params.shift = -0.2f;
+    sprite_devil_params.scale = 1.1f;
+    for (int i = 0; i < 9; ++i)
+    {
+        std::string path = std::string("resources/sprites/devil/anim/") + std::to_string(i) +
+                           ".png";
+        sprite_devil_params.animation.emplace_back(rg::image::Load(path.c_str()));
+    }
+    sprite_devil_params.animation_dist = 200;
+    sprite_devil_params.animation_speed = 10;
+    sprite_devil_params.blocked = true;
+    sprite_parameters["sprite_devil"] = std::move(sprite_devil_params);
+
+    SpriteParameter sprite_flame_params;
+    sprite_flame_params.sprite.emplace_back(
+            rg::image::Load("resources/sprites/flame/base/0.png"));
+    sprite_flame_params.shift = 0.7f;
+    sprite_flame_params.scale = 0.6f;
+    for (int i = 0; i < 16; ++i)
+    {
+        std::string path = std::string("resources/sprites/flame/anim/") + std::to_string(i) +
+                           ".png";
+        sprite_flame_params.animation.emplace_back(rg::image::Load(path.c_str()));
+    }
+    sprite_flame_params.animation_dist = 800;
+    sprite_flame_params.animation_speed = 5;
+    sprite_parameters["sprite_flame"] = std::move(sprite_flame_params);
+
     // image, static/animated, position, shift height, scale
     list_of_objects.emplace_back(
             &sprite_parameters["sprite_barrel"], rg::math::Vector2{7.1f, 2.1f});
     list_of_objects.emplace_back(
             &sprite_parameters["sprite_barrel"], rg::math::Vector2{5.9f, 2.1f});
+    list_of_objects.emplace_back(
+            &sprite_parameters["sprite_pin"], rg::math::Vector2{8.7f, 2.5f});
+    list_of_objects.emplace_back(
+            &sprite_parameters["sprite_devil"], rg::math::Vector2{7.0f, 4.0f});
+    list_of_objects.emplace_back(
+            &sprite_parameters["sprite_flame"], rg::math::Vector2{8.6f, 5.6f});
 }

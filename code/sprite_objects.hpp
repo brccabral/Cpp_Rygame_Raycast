@@ -11,7 +11,7 @@ struct SpriteParameter
     // base sprite
     std::vector<rg::Surface> sprite{};
     // if sprite rotates
-    std::vector<rg::math::Vector2<int>> viewing_angles{};
+    bool viewing_angles{};
     // y offset
     float shift{};
     // size
@@ -22,6 +22,8 @@ struct SpriteParameter
     int animation_dist{};
     // animation speed
     int animation_speed{};
+    // collision
+    bool blocked{};
 };
 
 class SpriteObject
