@@ -19,8 +19,8 @@ int main()
         float dt = 0;
 
         auto player = Player(
-                {static_cast<float>(Settings::GetInstance()->half_width),
-                 static_cast<float>(Settings::GetInstance()->half_height)}, 0.f,
+                {static_cast<float>(Settings::GetInstance()->half_width) / 4,
+                 static_cast<float>(Settings::GetInstance()->half_height) - 50.0f}, 0.f,
                 120,
                 1.2f);
         auto drawing = Drawing(sc, &sc_map, &player);

@@ -6,14 +6,14 @@ Drawing::Drawing(rg::Surface *sc, rg::Surface *sc_map, Player *player)
     : sc(sc), sc_map(sc_map), settings(Settings::GetInstance()),
       map_levels(MapLevels::GetInstance()), player(player)
 {
-    textures[1] = rg::image::Load("resources/images/1.png");
-    textures[2] = rg::image::Load("resources/images/2.png");
-    sky_surface = rg::image::Load("resources/images/sky.png");
+    textures[1] = rg::image::Load("resources/images/wall1.png");
+    textures[2] = rg::image::Load("resources/images/wall2.png");
+    sky_surface = rg::image::Load("resources/images/sky3.png");
 }
 
 void Drawing::background()
 {
-    const auto sky_offset = -5 * static_cast<int>(player->angle * 180.0f / M_PI) % settings->width;
+    const auto sky_offset = -10 * static_cast<int>(player->angle * 180.0f / M_PI) % settings->width;
     sc->Blit(&sky_surface, rg::math::Vector2{sky_offset, 0});
     sc->Blit(&sky_surface, rg::math::Vector2{sky_offset - settings->width, 0});
     sc->Blit(&sky_surface, rg::math::Vector2{sky_offset + settings->width, 0});
@@ -31,7 +31,7 @@ void Drawing::world()
 
 void Drawing::fps(const float dt)
 {
-    fps_text_surface = font.render(rl::TextFormat("%.1f", 1.0f / dt), settings->red);
+    fps_text_surface = font.render(rl::TextFormat("%.1f", 1.0f / dt), settings->darkorange);
     sc->Blit(&fps_text_surface, settings->fps_pos);
 }
 
@@ -45,7 +45,7 @@ void Drawing::mini_map() const
     for (auto [x, y]: map_levels->mini_map | std::views::keys)
     {
         rg::draw::rect(
-                sc_map, settings->sandy, {x, y, settings->map_tile, settings->map_tile});
+                sc_map, settings->darkbrown, {x, y, settings->map_tile, settings->map_tile});
     }
 
     // player position

@@ -161,8 +161,9 @@ void ray_casting_depth(
                 rg::math::Vector2{ray * settings->scale,
                                   settings->half_height - int(proj_height / 2)},
                 {
-                        offset * settings->scale, 0.0f, static_cast<float>(settings->scale),
-                        static_cast<float>(settings->texture_height)}, rl::BLEND_ALPHA,
+                        offset * settings->texture_scale, 0.0f,
+                        static_cast<float>(settings->texture_scale),
+                        -static_cast<float>(settings->texture_height)}, rl::BLEND_ALPHA,
                 settings->scale, proj_height);
 
         cur_angle += settings->delta_angle;

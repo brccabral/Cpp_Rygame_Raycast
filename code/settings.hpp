@@ -24,6 +24,8 @@ public:
     rl::Color raycolor = {220, 220, 0, 255};
     rl::Color yellow = {220, 220, 0, 255};
     rl::Color sandy = {244, 164, 90, 255};
+    rl::Color darkbrown = {97, 61, 25, 255};
+    rl::Color darkorange = {255, 140, 0, 255};
     int tile = 100;
 
     float fov = PI / 3.0f;
