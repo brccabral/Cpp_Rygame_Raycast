@@ -17,13 +17,13 @@ int main()
         auto *sc = &rg::display::SetMode(settings->width, settings->height);
         auto sc_map = rg::Surface(settings->minimap_res.x, settings->minimap_res.y);
 
+        rl::HideCursor();
         float dt = 0;
 
         auto player = Player(
-                {static_cast<float>(Settings::GetInstance()->half_width) / 4,
-                 static_cast<float>(Settings::GetInstance()->half_height) - 50.0f}, 0.f,
-                120,
-                1.2f);
+                {static_cast<float>(settings->half_width) / 4,
+                 static_cast<float>(settings->half_height) - 50.0f},
+                0.f, 120, 1.2f, 0.3f);
         auto drawing = Drawing(sc, &sc_map, &player);
         Sprites sprites{};
 
@@ -31,7 +31,7 @@ int main()
         {
             dt = rl::GetFrameTime();
 
-            player.movement(dt, sc);
+            player.movement(dt);
 
             sc->Fill(settings->black);
 

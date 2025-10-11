@@ -5,9 +5,9 @@
 
 Player::Player(
         const rg::math::Vector2<float> &pos, const float angle, const int speed,
-        const float rotation_speed)
+        const float rotation_speed, const float mouse_sensitivity)
     : x(pos.x), y(pos.y), angle(angle), speed(speed), rotation_speed(rotation_speed),
-      settings(Settings::GetInstance())
+      mouse_sensitivity(mouse_sensitivity), settings(Settings::GetInstance())
 {
 }
 
@@ -21,7 +21,18 @@ rg::math::Vector2<float> Player::pos_map() const
     return {x / settings->map_scale, y / settings->map_scale};
 }
 
-void Player::movement(const float dt, rg::Surface *sc)
+void Player::movement(const float dt)
+{
+    keys_control(dt);
+    mouse_control(dt);
+
+    // angle %= double_pi (modulo)
+    angle += settings->double_pi;
+    const auto div = angle / settings->double_pi;
+    angle = angle - int(div) * settings->double_pi;
+}
+
+void Player::keys_control(const float dt)
 {
     const auto sin_a = sinf(angle);
     const auto cos_a = cosf(angle);
@@ -54,8 +65,14 @@ void Player::movement(const float dt, rg::Surface *sc)
     {
         angle += rotation_speed * dt;
     }
-    // angle %= double_pi (modulo)
-    angle += settings->double_pi;
-    const auto div = angle / settings->double_pi;
-    angle = angle - int(div) * settings->double_pi;
+}
+
+void Player::mouse_control(const float dt)
+{
+    // const float difference = rl::GetMouseDelta().x;
+    const float difference = rl::GetMousePosition().x - settings->half_width;
+    // always center the mouse after detecting the difference to
+    // have the same reference at all passes
+    rl::SetMousePosition(settings->half_width, settings->half_height);
+    angle += difference * mouse_sensitivity * dt;
 }
