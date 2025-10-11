@@ -8,14 +8,15 @@ Drawing::Drawing(rg::Surface *sc, rg::Surface *sc_map, Player *player)
 {
     textures[1] = rg::image::Load("resources/images/1.png");
     textures[2] = rg::image::Load("resources/images/2.png");
+    sky_surface = rg::image::Load("resources/images/sky.png");
 }
 
-void Drawing::background() const
+void Drawing::background()
 {
-    rg::draw::rect(
-            sc, settings->skyblue,
-            {0, 0, (settings->width),
-             (settings->half_height)});
+    const auto sky_offset = -5 * static_cast<int>(player->angle * 180.0f / M_PI) % settings->width;
+    sc->Blit(&sky_surface, rg::math::Vector2{sky_offset, 0});
+    sc->Blit(&sky_surface, rg::math::Vector2{sky_offset - settings->width, 0});
+    sc->Blit(&sky_surface, rg::math::Vector2{sky_offset + settings->width, 0});
     rg::draw::rect(
             sc, settings->darkgray,
             {0, settings->half_height, settings->width, settings->half_height});
