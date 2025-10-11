@@ -1,17 +1,16 @@
 #include "sprite_objects.hpp"
 
-SpriteObject::SpriteObject(
-        std::vector<rg::Surface> *objects, const bool is_static, const rg::math::Vector2<float> pos,
-        const float shift, const float scale)
-    : objects(objects), is_static(is_static), pos(pos), x(pos.x), y(pos.y), shift(shift),
-      scale(scale)
+SpriteObject::SpriteObject(SpriteParameter *parameter, rg::math::Vector2<float> pos)
+    : pos(pos), parameter(parameter)
 {
-    x *= Settings::GetInstance()->tile;
-    y *= Settings::GetInstance()->tile;
+    x = pos.x * Settings::GetInstance()->tile;
+    y = pos.y * Settings::GetInstance()->tile;
     this->pos.x = x;
     this->pos.y = y;
 
-    if (!is_static)
+    object = &parameter->sprite[0];
+
+    if (!parameter->viewing_angles.empty())
     {
         for (int i = 0; i < 360; i += 45)
         {
@@ -19,14 +18,12 @@ SpriteObject::SpriteObject(
         }
         for (int i = 0; i < sprite_angles.size(); ++i)
         {
-            sprite_positions[sprite_angles[i]] = &(*this->objects)[i];
+            sprite_positions[sprite_angles[i]] = &parameter->sprite[i];
         }
     }
-
-    current_object = &(*this->objects)[0];
 }
 
-SpriteObjectLocate SpriteObject::object_locate(const Player *player)
+SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float dt)
 {
     const Settings *settings = Settings::GetInstance();
 
@@ -55,7 +52,7 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player)
 
     // FAKE_RAYS_RANGE increase rays on the sides to avoid a
     // sprite disappearing when close to the border of the screen
-    auto fake_ray = current_ray + settings->fake_rays;
+    const auto fake_ray = current_ray + settings->fake_rays;
     // check if sprite is inside "field of view" and
     // if it is more than 30 px of distance to avoid
     // dropping frame rate when player is too close
@@ -63,11 +60,12 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player)
     if (0 <= fake_ray && fake_ray <= settings->fake_rays_range && distance_to_sprite > 30)
     {
         const auto proj_height = std::min(
-                int(settings->proj_coeff / distance_to_sprite * scale), settings->double_height);
+                int(settings->proj_coeff / distance_to_sprite * parameter->scale),
+                settings->double_height);
         const auto half_proj_height = proj_height / 2;
-        const auto sprite_shift = half_proj_height * shift;
+        const auto sprite_shift = half_proj_height * parameter->shift;
 
-        if (!is_static)
+        if (!parameter->viewing_angles.empty())
         {
             if (theta < 0)
             {
@@ -79,13 +77,24 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player)
             {
                 if (theta >= angles.x && theta < angles.y)
                 {
-                    current_object = sprite_positions[angles];
+                    object = sprite_positions[angles];
                     break;
                 }
             }
         }
 
-        return {distance_to_sprite, current_object,
+        // sprite animation
+        if (!parameter->animation.empty() && distance_to_sprite < parameter->animation_dist)
+        {
+            animation_index += parameter->animation_speed * dt;
+            if (animation_index >= parameter->animation.size())
+            {
+                animation_index = 0;
+            }
+            object = &parameter->animation[int(animation_index)];
+        }
+
+        return {distance_to_sprite, object,
                 {static_cast<float>(proj_height), static_cast<float>(proj_height)},
                 {current_ray * settings->scale - half_proj_height,
                  settings->half_height - half_proj_height + static_cast<int>(sprite_shift)},
@@ -96,30 +105,25 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player)
 
 Sprites::Sprites()
 {
-    std::vector<rg::Surface> barrel_surfs;
-    barrel_surfs.emplace_back(rg::image::Load("resources/sprites/barrel/base/0.png"));
-    sprite_types["barrel"] = std::move(barrel_surfs);
-    std::vector<rg::Surface> pedestal_surfs;
-    pedestal_surfs.emplace_back(rg::image::Load("resources/sprites/pedestal/base/0.png"));
-    sprite_types["pedestal"] = std::move(pedestal_surfs);
-    std::vector<rg::Surface> devil_surfs;
-    for (int i = 0; i < 8; ++i)
+    SpriteParameter sprite_barrel_params;
+    sprite_barrel_params.sprite.emplace_back(
+            rg::image::Load("resources/sprites/barrel/base/0.png"));
+    sprite_barrel_params.viewing_angles = {};
+    sprite_barrel_params.shift = 1.8f;
+    sprite_barrel_params.scale = 0.4f;
+    for (int i = 0; i < 13; ++i)
     {
-        std::string path = std::string("resources/sprites/devil/base/") + std::to_string(i) +
-                           std::string(".png");
-        devil_surfs.emplace_back(rg::image::Load(path.c_str()));
+        std::string path = std::string("resources/sprites/barrel/anim/") + std::to_string(i) +
+                           ".png";
+        sprite_barrel_params.animation.emplace_back(rg::image::Load(path.c_str()));
     }
-    sprite_types["devil"] = std::move(devil_surfs);
+    sprite_barrel_params.animation_dist = 800;
+    sprite_barrel_params.animation_speed = 10;
+    sprite_parameters["sprite_barrel"] = std::move(sprite_barrel_params);
 
     // image, static/animated, position, shift height, scale
     list_of_objects.emplace_back(
-            &sprite_types["barrel"], true, rg::math::Vector2{7.1f, 2.1f}, 1.8f, 0.4f);
+            &sprite_parameters["sprite_barrel"], rg::math::Vector2{7.1f, 2.1f});
     list_of_objects.emplace_back(
-            &sprite_types["barrel"], true, rg::math::Vector2{5.9f, 2.1f}, 1.8f, 0.4f);
-    list_of_objects.emplace_back(
-            &sprite_types["pedestal"], true, rg::math::Vector2{8.8f, 2.5f}, 1.6f, 0.5f);
-    list_of_objects.emplace_back(
-            &sprite_types["pedestal"], true, rg::math::Vector2{8.8f, 5.6f}, 1.6f, 0.5f);
-    list_of_objects.emplace_back(
-            &sprite_types["devil"], false, rg::math::Vector2{7.0f, 4.0f}, -0.2f, 0.7f);
+            &sprite_parameters["sprite_barrel"], rg::math::Vector2{5.9f, 2.1f});
 }
