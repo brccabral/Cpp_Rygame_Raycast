@@ -23,10 +23,23 @@ void Drawing::background()
     sc_map->Fill(settings->black);
 }
 
-void Drawing::world()
+void Drawing::world(std::vector<SpriteObjectLocate> &locates) const
 {
-    // ray_casting_distance(sc, sc_map, player, settings, &textures);
-    ray_casting_depth(sc, sc_map, player, settings, &textures);
+    std::ranges::sort(
+            locates, [](
+            const SpriteObjectLocate &locate1, const SpriteObjectLocate &locate2)
+            {
+                return locate1.depth > locate2.depth;
+            });
+    for (const auto &locate: locates)
+    {
+        if (locate.depth)
+        {
+            sc->Blit(
+                    locate.sprite, locate.sprite_pos, locate.sprite_area, rl::BLEND_ALPHA,
+                    locate.sprite_dimension.x, locate.sprite_dimension.y);
+        }
+    }
 }
 
 void Drawing::fps(const float dt)

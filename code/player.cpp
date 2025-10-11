@@ -54,4 +54,8 @@ void Player::movement(const float dt, rg::Surface *sc)
     {
         angle += rotation_speed * dt;
     }
+    // angle %= double_pi (modulo)
+    angle += settings->double_pi;
+    const auto div = angle / settings->double_pi;
+    angle = angle - int(div) * settings->double_pi;
 }

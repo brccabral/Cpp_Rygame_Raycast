@@ -63,10 +63,12 @@ void ray_casting_distance(
     }
 }
 
-void ray_casting_depth(
-        rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings,
+std::vector<SpriteObjectLocate> ray_casting_depth(
+        rg::Surface *sc_map, const Player *player, const Settings *settings,
         std::unordered_map<int, rg::Surface> *textures)
 {
+    std::vector<SpriteObjectLocate> walls{};
+
     auto [ox, oy] = player->pos();
     auto [xm, ym] = mapping(ox, oy);
     auto cur_angle = player->angle - settings->half_fov;
@@ -156,17 +158,16 @@ void ray_casting_depth(
         // project wall, limit rect height
         auto proj_height = std::min(settings->proj_coeff / depth, 2.0f * settings->height);
 
-        sc->Blit(
-                &(*textures)[texture],
+        walls.emplace_back(
+                depth, &(*textures)[texture],
+                rg::math::Vector2{static_cast<float>(settings->scale), proj_height},
                 rg::math::Vector2{ray * settings->scale,
                                   settings->half_height - int(proj_height / 2)},
-                {
-                        offset * settings->texture_scale, 0.0f,
-                        static_cast<float>(settings->texture_scale),
-                        -static_cast<float>(settings->texture_height)}, rl::BLEND_ALPHA,
-                settings->scale, proj_height);
-
+                rg::Rect{offset * settings->texture_scale, 0.0f,
+                         static_cast<float>(settings->texture_scale),
+                         -static_cast<float>(settings->texture_height)});
         cur_angle += settings->delta_angle;
     }
 
+    return walls;
 }

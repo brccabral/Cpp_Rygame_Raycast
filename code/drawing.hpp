@@ -12,7 +12,7 @@ public:
     Drawing(rg::Surface *sc, rg::Surface *sc_map, Player *player);
 
     void background();
-    void world();
+    void world(std::vector<SpriteObjectLocate> &locates) const;
     void fps(float dt);
     void mini_map() const;
 

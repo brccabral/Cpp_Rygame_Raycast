@@ -3,6 +3,8 @@
 #include "drawing.hpp"
 #include "settings.hpp"
 #include "player.hpp"
+#include "ray_casting.hpp"
+#include "sprite_objects.hpp"
 
 
 int main()
@@ -24,6 +26,7 @@ int main()
                 120,
                 1.2f);
         auto drawing = Drawing(sc, &sc_map, &player);
+        Sprites sprites{};
 
         while (!rg::WindowCloseOrQuit())
         {
@@ -34,7 +37,16 @@ int main()
             sc->Fill(settings->black);
 
             drawing.background();
-            drawing.world();
+            auto walls = ray_casting_depth(&sc_map, &player, settings, &drawing.textures);
+            static std::vector<SpriteObjectLocate> locates;
+            locates.clear();
+            locates.reserve(walls.size() + sprites.list_of_objects.size());
+            locates.insert(locates.begin(), walls.begin(), walls.end());
+            for (auto &obj: sprites.list_of_objects)
+            {
+                locates.emplace_back(obj.object_locate(&player, settings, walls));
+            }
+            drawing.world(locates);
             drawing.mini_map();
             drawing.fps(dt);
 

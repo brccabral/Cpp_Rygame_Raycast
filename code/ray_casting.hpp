@@ -15,6 +15,6 @@ rg::math::Vector2<int> mapping(N a, N b)
 void ray_casting_distance(
         rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings,
         std::unordered_map<int, rg::Surface> *textures);
-void ray_casting_depth(
-        rg::Surface *sc, rg::Surface *sc_map, const Player *player, const Settings *settings,
+std::vector<SpriteObjectLocate> ray_casting_depth(
+        rg::Surface *sc_map, const Player *player, const Settings *settings,
         std::unordered_map<int, rg::Surface> *textures);

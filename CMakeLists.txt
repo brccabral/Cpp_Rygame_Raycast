@@ -13,6 +13,7 @@ add_executable(
     code/player.cpp
     code/ray_casting.cpp
     code/settings.cpp
+    code/sprite_objects.cpp
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE rygame)
 

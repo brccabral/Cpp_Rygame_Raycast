@@ -51,10 +51,23 @@ public:
     int texture_height = 1200;
     int texture_scale = texture_width / tile;
 
+    // sprite settings
+    float double_pi = 2 * M_PI;
+    int center_ray = num_rays / 2 - 1;
+
 private:
 
     Settings() = default;
     ~Settings() = default;
 
     static Settings *instance;
+};
+
+struct SpriteObjectLocate
+{
+    float depth{};
+    rg::Surface *sprite{};
+    rg::math::Vector2<float> sprite_dimension{};
+    rg::math::Vector2<int> sprite_pos{};
+    rg::Rect sprite_area{};
 };
