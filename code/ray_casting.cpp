@@ -77,10 +77,13 @@ std::vector<SpriteObjectLocate> ray_casting_depth(
     auto [ox, oy] = player->pos();
     auto [xm, ym] = mapping(ox, oy);
     auto cur_angle = player->angle - settings->half_fov;
-    auto [ray_x, ray_y] = player->pos();
 
-    int ray_x_v = xm, ray_x_h = xm;
-    int ray_y_v = ym, ray_y_h = ym;
+    // rays of field of view on minimap
+    // game won't crash if player goes out of map
+    auto [ray_x_v, ray_y_v] = player->pos();
+    auto ray_x_h = ray_x_v, ray_x = ray_x_v;
+    auto ray_y_h = ray_y_v, ray_y = ray_y_v;
+
     float depth = 0, depth_v = 0, depth_h = 0;
 
     float xh = 0, yv = 0, offset = 0;
