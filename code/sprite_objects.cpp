@@ -11,15 +11,19 @@ SpriteObject::SpriteObject(SpriteParameter *parameter, const rg::math::Vector2<f
 
     object = &parameter->sprite[0];
 
-    if (!parameter->viewing_angles)
+    if (parameter->viewing_angles)
     {
-        for (int i = 0; i < 360; i += 45)
+        sprite_angles.emplace_back(338, 361);
+        sprite_positions[sprite_angles[0]] = &parameter->sprite[0];
+        sprite_angles.emplace_back(0, 23);
+        sprite_positions[sprite_angles[1]] = &parameter->sprite[0];
+        for (int i = 23; i < 338; i += 45)
         {
             sprite_angles.emplace_back(i, i + 45);
         }
-        for (int i = 0; i < sprite_angles.size(); ++i)
+        for (int i = 2; i < sprite_angles.size(); ++i)
         {
-            sprite_positions[sprite_angles[i]] = &parameter->sprite[i];
+            sprite_positions[sprite_angles[i]] = &parameter->sprite[i - 1];
         }
     }
 
@@ -39,10 +43,13 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
 
     // work with positive angles
     const auto degrees = player->angle * 180.0f / M_PI;
-    if (dx > 0.0f && 180.0f <= degrees && degrees <= 360.0f || dx < 0.0f && dy < 0.0f)
+    if (dx > 0.0f && 180.0f <= degrees && degrees <= 360.0f || (dx < 0.0f && dy < 0.0f))
     {
         gamma += settings->double_pi;
     }
+
+    // shifted viewing angles to compensate sprites positions
+    theta -= 1.4f * gamma;
 
     // delta_rays = number of rays between player direction and sprite
     const auto delta_rays = int(gamma / settings->delta_angle);
@@ -66,24 +73,6 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
         const auto half_proj_height = proj_height / 2;
         const auto sprite_shift = half_proj_height * parameter->shift;
 
-        if (!parameter->viewing_angles)
-        {
-            if (theta < 0)
-            {
-                theta += settings->double_pi;
-            }
-            theta = 360 - int(theta * 180.0f / M_PI);
-
-            for (const auto &angles: sprite_angles)
-            {
-                if (theta >= angles.x && theta < angles.y)
-                {
-                    object = sprite_positions[angles];
-                    break;
-                }
-            }
-        }
-
         // sprite animation
         if (!parameter->animation.empty() && distance_to_sprite < parameter->animation_dist)
         {
@@ -96,7 +85,27 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
         }
         else
         {
-            object = &parameter->sprite[0];
+            if (parameter->viewing_angles)
+            {
+                if (theta < 0)
+                {
+                    theta += settings->double_pi;
+                }
+                theta = 360 - int(theta * 180.0f / M_PI);
+
+                for (const auto &angles: sprite_angles)
+                {
+                    if (theta >= angles.x && theta < angles.y)
+                    {
+                        object = sprite_positions[angles];
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                object = &parameter->sprite[0];
+            }
         }
 
         position = {current_ray * settings->scale - half_proj_height,
@@ -160,8 +169,12 @@ Sprites::Sprites()
     sprite_parameters["sprite_pin"] = std::move(sprite_pin_params);
 
     SpriteParameter sprite_devil_params;
-    sprite_devil_params.sprite.emplace_back(
-            rg::image::Load("resources/sprites/devil/base/0.png"));
+    for (int i = 0; i < 8; ++i)
+    {
+        std::string path = std::string("resources/sprites/devil/base/") + std::to_string(i) +
+                           ".png";
+        sprite_devil_params.sprite.emplace_back(rg::image::Load(path.c_str()));
+    }
     sprite_devil_params.viewing_angles = true;
     sprite_devil_params.shift = -0.2f;
     sprite_devil_params.scale = 1.1f;
