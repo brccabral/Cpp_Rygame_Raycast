@@ -1,7 +1,6 @@
 #pragma once
 #include <rygame.hpp>
 
-#include "maplevels.hpp"
 #include "player.hpp"
 #include "settings.hpp"
 
@@ -16,5 +15,6 @@ rg::math::Vector2<int> mapping(N a, N b)
 void ray_casting_distance(
         rg::Surface *sc, rg::Surface *sc_map, const Player *player,
         std::unordered_map<int, rg::Surface> *textures);
-std::vector<SpriteObjectLocate> ray_casting_depth(
+// return list of SpriteObjectLocate (walls) - depth, surface, dimension, pos, texture area
+std::vector<SpriteObjectLocate> &ray_casting_depth(
         rg::Surface *sc_map, const Player *player, std::unordered_map<int, rg::Surface> *textures);

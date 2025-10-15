@@ -74,6 +74,8 @@ struct SpriteObjectLocate
     float depth{};
     rg::Surface *sprite{};
     rg::math::Vector2<float> sprite_dimension{};
-    rg::math::Vector2<int> sprite_pos{};
+    rg::math::Vector2<float> sprite_pos{};
     rg::Rect sprite_area{};
+    float x{};
+    float y{};
 };

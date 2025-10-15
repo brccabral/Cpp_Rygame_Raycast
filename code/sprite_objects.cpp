@@ -1,14 +1,13 @@
+#include <limits>
 #include "sprite_objects.hpp"
 
 SpriteObject::SpriteObject(SpriteParameter *parameter, const rg::math::Vector2<float> pos)
-    : pos(pos), parameter(parameter), settings(Settings::GetInstance())
+    : parameter(parameter), settings(Settings::GetInstance())
 {
     blocked = parameter->blocked;
 
     x = pos.x * settings->tile;
     y = pos.y * settings->tile;
-    this->pos.x = x - side / 2;
-    this->pos.y = y - side / 2;
 
     object = &parameter->sprite[0];
 
@@ -23,13 +22,15 @@ SpriteObject::SpriteObject(SpriteParameter *parameter, const rg::math::Vector2<f
             sprite_positions[sprite_angles[i]] = &parameter->sprite[i];
         }
     }
+
+    animation_speed = parameter->animation_speed;
 }
 
 SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float dt)
 {
     const auto dx = x - player->x;
     const auto dy = y - player->y;
-    auto distance_to_sprite = std::sqrt(dx * dx + dy * dy);
+    distance_to_sprite = std::sqrt(dx * dx + dy * dy);
 
     // theta = sprite to player horizontal
     auto theta = atan2(dy, dx);
@@ -45,7 +46,7 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
 
     // delta_rays = number of rays between player direction and sprite
     const auto delta_rays = int(gamma / settings->delta_angle);
-    const auto current_ray = settings->center_ray + delta_rays;
+    current_ray = settings->center_ray + delta_rays;
 
     // fix fish eye
     distance_to_sprite *= cosf(settings->half_fov - current_ray * settings->delta_angle);
@@ -59,7 +60,7 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
     // of a sprite, or a sprite is half-way behind a wall
     if (0 <= fake_ray && fake_ray <= settings->fake_rays_range && distance_to_sprite > 30)
     {
-        const auto proj_height = std::min(
+        proj_height = std::min(
                 int(settings->proj_coeff / distance_to_sprite * parameter->scale),
                 settings->double_height);
         const auto half_proj_height = proj_height / 2;
@@ -98,13 +99,30 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
             object = &parameter->sprite[0];
         }
 
-        return {distance_to_sprite, object,
-                {static_cast<float>(proj_height), static_cast<float>(proj_height)},
-                {current_ray * settings->scale - half_proj_height,
-                 settings->half_height - half_proj_height + static_cast<int>(sprite_shift)},
-                {}};
+        position = {current_ray * settings->scale - half_proj_height,
+                    settings->half_height - half_proj_height + sprite_shift};
+
+        return {.depth = distance_to_sprite, .sprite = object,
+                .sprite_dimension = {proj_height, proj_height},
+                .sprite_pos = position,
+                .sprite_area = {}};
     }
     return {};
+}
+
+rg::math::Vector2<float> SpriteObject::pos() const
+{
+    return {x - side / 2, y - side / 2};
+}
+
+SpriteProjection SpriteObject::sprite_projection() const
+{
+    if (settings->center_ray - side < current_ray && current_ray < settings->center_ray + side &&
+        parameter->blocked)
+    {
+        return {.depth = distance_to_sprite, .proj_height = proj_height, .x = x, .y = y};
+    }
+    return {.depth = std::numeric_limits<float>::infinity(), .proj_height = 0, .x = 0, .y = 0};
 }
 
 Sprites::Sprites()
@@ -184,4 +202,19 @@ Sprites::Sprites()
             &sprite_parameters["sprite_devil"], rg::math::Vector2{7.0f, 4.0f});
     list_of_objects.emplace_back(
             &sprite_parameters["sprite_flame"], rg::math::Vector2{8.6f, 5.6f});
+}
+
+SpriteProjection Sprites::closest_sprite_projection() const
+{
+    SpriteProjection result{.depth = std::numeric_limits<float>::infinity(),
+                            .proj_height = 0, .x = 0, .y = 0};
+    for (const auto &obj: list_of_objects)
+    {
+        const auto proj = obj.sprite_projection();
+        if (proj.depth < result.depth)
+        {
+            result = proj;
+        }
+    }
+    return result;
 }

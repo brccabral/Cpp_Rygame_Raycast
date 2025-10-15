@@ -47,7 +47,7 @@ void Drawing::world(std::vector<SpriteObjectLocate> &locates) const
              sprite,
              sprite_dimension,
              sprite_pos,
-             sprite_area]: locates)
+             sprite_area, x, y]: locates)
     {
         if (depth)
         {
@@ -88,7 +88,7 @@ void Drawing::mini_map() const
     sc->Blit(sc_map, settings->map_pos);
 }
 
-void Drawing::player_weapon(const float dt)
+void Drawing::player_weapon(const float dt, SpriteObject *sfx)
 {
     if (player->shot)
     {

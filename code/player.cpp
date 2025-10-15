@@ -16,7 +16,7 @@ Player::Player(
     {
         if (object.blocked)
         {
-            collision_list.emplace_back(object.pos.x, object.pos.y, object.side, object.side);
+            collision_list.emplace_back(object.pos().x, object.pos().y, object.side, object.side);
         }
     }
     collision_list.insert(

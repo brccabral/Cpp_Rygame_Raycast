@@ -66,13 +66,15 @@ void ray_casting_distance(
     }
 }
 
-std::vector<SpriteObjectLocate> ray_casting_depth(
+std::vector<SpriteObjectLocate> &ray_casting_depth(
         rg::Surface *sc_map, const Player *player, std::unordered_map<int, rg::Surface> *textures)
 {
     const Settings *settings = Settings::GetInstance();
     const MapLevels *map_levels = MapLevels::GetInstance();
 
-    std::vector<SpriteObjectLocate> walls{};
+    static std::vector<SpriteObjectLocate> walls{};
+    walls.clear();
+    walls.reserve(settings->num_rays);
 
     auto [ox, oy] = player->pos();
     auto [xm, ym] = mapping(ox, oy);
@@ -169,11 +171,12 @@ std::vector<SpriteObjectLocate> ray_casting_depth(
         walls.emplace_back(
                 depth, &(*textures)[texture],
                 rg::math::Vector2{static_cast<float>(settings->scale), proj_height},
-                rg::math::Vector2{ray * settings->scale,
-                                  settings->half_height - int(proj_height / 2)},
+                rg::math::Vector2{static_cast<float>(ray * settings->scale),
+                                  settings->half_height - proj_height / 2.0f},
                 rg::Rect{offset * settings->texture_scale, 0.0f,
                          static_cast<float>(settings->texture_scale),
-                         -static_cast<float>(settings->texture_height)});
+                         -static_cast<float>(settings->texture_height)},
+                ray_x, ray_y);
         cur_angle += settings->delta_angle;
     }
 
