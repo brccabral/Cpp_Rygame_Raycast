@@ -28,6 +28,7 @@ SpriteObject::SpriteObject(SpriteParameter *parameter, const rg::math::Vector2<f
     }
 
     animation_speed = parameter->animation_speed;
+    is_dead = parameter->is_dead;
 }
 
 SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float dt)
@@ -37,7 +38,7 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
     distance_to_sprite = std::sqrt(dx * dx + dy * dy);
 
     // theta = sprite to player horizontal
-    auto theta = atan2(dy, dx);
+    theta = atan2(dy, dx);
     // gamma = angle between sprite and player direction
     auto gamma = theta - player->angle;
 
@@ -68,51 +69,36 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
     if (0 <= fake_ray && fake_ray <= settings->fake_rays_range && distance_to_sprite > 30)
     {
         proj_height = std::min(
-                int(settings->proj_coeff / distance_to_sprite * parameter->scale),
+                int(settings->proj_coeff / distance_to_sprite),
                 settings->double_height);
-        const auto half_proj_height = proj_height / 2;
-        const auto sprite_shift = half_proj_height * parameter->shift;
 
-        // sprite animation
-        if (!parameter->animation.empty() && distance_to_sprite < parameter->animation_dist)
+        auto sprite_width = proj_height * parameter->scale.x;
+        auto sprite_height = proj_height * parameter->scale.y;
+        const auto half_sprite_width = sprite_width / 2.0f;
+        const auto half_sprite_height = sprite_height / 2.0f;
+
+        auto shift = half_sprite_height * parameter->shift;
+
+        if (is_dead == SpriteStatus::STATUS_DEAD)
         {
-            animation_index += parameter->animation_speed * dt;
-            if (animation_index >= parameter->animation.size())
-            {
-                animation_index = 0;
-            }
-            object = &parameter->animation[int(animation_index)];
+            object = dead_animation(dt);
+            shift = half_sprite_height * parameter->dead_shift;
+        }
+        else if (npc_action_trigger)
+        {
+            object = npc_in_action(dt);
         }
         else
         {
-            if (parameter->viewing_angles)
-            {
-                if (theta < 0)
-                {
-                    theta += settings->double_pi;
-                }
-                theta = 360 - int(theta * 180.0f / M_PI);
-
-                for (const auto &angles: sprite_angles)
-                {
-                    if (theta >= angles.x && theta < angles.y)
-                    {
-                        object = sprite_positions[angles];
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                object = &parameter->sprite[0];
-            }
+            object = visible_sprite();
+            object = sprite_animation(dt);
         }
 
-        position = {current_ray * settings->scale - half_proj_height,
-                    settings->half_height - half_proj_height + sprite_shift};
+        position = {current_ray * settings->scale - half_sprite_width,
+                    settings->half_height - half_sprite_height + shift};
 
         return {.depth = distance_to_sprite, .sprite = object,
-                .sprite_dimension = {proj_height, proj_height},
+                .sprite_dimension = {sprite_width, sprite_height},
                 .sprite_pos = position,
                 .sprite_area = {}};
     }
@@ -134,13 +120,78 @@ SpriteProjection SpriteObject::sprite_projection() const
     return {.depth = std::numeric_limits<float>::infinity(), .proj_height = 0, .x = 0, .y = 0};
 }
 
+rg::Surface *SpriteObject::dead_animation(const float dt)
+{
+    rg::Surface *result = nullptr;
+    if (!parameter->death_animation.empty())
+    {
+        if (dead_animation_index < parameter->death_animation.size())
+        {
+            result = &parameter->death_animation[int(dead_animation_index)];
+            dead_animation_index += dt * parameter->death_animation_speed;
+        }
+        else
+        {
+            result = &parameter->death_animation.back();
+            dead_animation_index = 0;
+        }
+    }
+    return result;
+}
+
+rg::Surface *SpriteObject::npc_in_action(const float dt)
+{
+    rg::Surface *result = &parameter->obj_action[int(animation_index)];
+    animation_index += dt * parameter->animation_speed;
+    if (animation_index >= parameter->obj_action.size())
+    {
+        animation_index = 0;
+    }
+    return result;
+}
+
+rg::Surface *SpriteObject::sprite_animation(const float dt)
+{
+    if (!parameter->animation.empty() && distance_to_sprite < parameter->animation_dist)
+    {
+        animation_index += dt * parameter->animation_speed;
+        if (animation_index >= parameter->animation.size())
+        {
+            animation_index = 0;
+        }
+        return &parameter->animation[int(animation_index)];
+    }
+    return object;
+}
+
+rg::Surface *SpriteObject::visible_sprite()
+{
+    if (parameter->viewing_angles)
+    {
+        if (theta < 0)
+        {
+            theta += settings->double_pi;
+        }
+        theta = 360 - int(theta * 180.f / M_PI);
+        for (const auto &angles: sprite_angles)
+        {
+            if (theta >= angles.x && theta < angles.y)
+            {
+                return sprite_positions[angles];
+            }
+        }
+    }
+    return object;
+}
+
 Sprites::Sprites()
 {
     SpriteParameter sprite_barrel_params;
     sprite_barrel_params.sprite.emplace_back(
             rg::image::Load("resources/sprites/barrel/base/0.png"));
     sprite_barrel_params.shift = 1.8f;
-    sprite_barrel_params.scale = 0.4f;
+    sprite_barrel_params.scale = {0.4f, 0.4f};
+    sprite_barrel_params.side = 30;
     for (int i = 0; i < 13; ++i)
     {
         std::string path = std::string("resources/sprites/barrel/anim/") + std::to_string(i) +
@@ -150,13 +201,22 @@ Sprites::Sprites()
     sprite_barrel_params.animation_dist = 800;
     sprite_barrel_params.animation_speed = 10;
     sprite_barrel_params.blocked = true;
+    for (int i = 0; i < 4; ++i)
+    {
+        std::string path = std::string("resources/sprites/barrel/death/") + std::to_string(i) +
+                           ".png";
+        sprite_barrel_params.death_animation.emplace_back(rg::image::Load(path.c_str()));
+    }
+    sprite_barrel_params.death_animation_speed = 10;
+    sprite_barrel_params.dead_shift = 2.6f;
     sprite_parameters["sprite_barrel"] = std::move(sprite_barrel_params);
 
     SpriteParameter sprite_pin_params;
     sprite_pin_params.sprite.emplace_back(
             rg::image::Load("resources/sprites/pin/base/0.png"));
     sprite_pin_params.shift = 0.6f;
-    sprite_pin_params.scale = 0.6f;
+    sprite_pin_params.scale = {0.6f, 0.6f};
+    sprite_pin_params.side = 30;
     for (int i = 0; i < 8; ++i)
     {
         std::string path = std::string("resources/sprites/pin/anim/") + std::to_string(i) +
@@ -166,6 +226,7 @@ Sprites::Sprites()
     sprite_pin_params.animation_dist = 800;
     sprite_pin_params.animation_speed = 10;
     sprite_pin_params.blocked = true;
+    sprite_pin_params.is_dead = SpriteStatus::STATUS_IMMORTAL;
     sprite_parameters["sprite_pin"] = std::move(sprite_pin_params);
 
     SpriteParameter sprite_devil_params;
@@ -176,24 +237,35 @@ Sprites::Sprites()
         sprite_devil_params.sprite.emplace_back(rg::image::Load(path.c_str()));
     }
     sprite_devil_params.viewing_angles = true;
-    sprite_devil_params.shift = -0.2f;
-    sprite_devil_params.scale = 1.1f;
+    sprite_devil_params.shift = 0.2f;
+    sprite_devil_params.scale = {1.1f, 1.1f};
+    sprite_devil_params.side = 50;
     for (int i = 0; i < 9; ++i)
     {
         std::string path = std::string("resources/sprites/devil/anim/") + std::to_string(i) +
                            ".png";
-        sprite_devil_params.animation.emplace_back(rg::image::Load(path.c_str()));
+        sprite_devil_params.obj_action.emplace_back(rg::image::Load(path.c_str()));
     }
     sprite_devil_params.animation_dist = 200;
     sprite_devil_params.animation_speed = 10;
     sprite_devil_params.blocked = true;
+    for (int i = 0; i < 6; ++i)
+    {
+        std::string path = std::string("resources/sprites/devil/death/") + std::to_string(i) +
+                           ".png";
+        sprite_devil_params.death_animation.emplace_back(rg::image::Load(path.c_str()));
+    }
+    sprite_devil_params.death_animation_speed = 10;
+    sprite_devil_params.dead_shift = 0.6f;
+    sprite_devil_params.flag_type = SpriteFlagType::FLAG_NPC;
     sprite_parameters["sprite_devil"] = std::move(sprite_devil_params);
 
     SpriteParameter sprite_flame_params;
     sprite_flame_params.sprite.emplace_back(
             rg::image::Load("resources/sprites/flame/base/0.png"));
     sprite_flame_params.shift = 0.7f;
-    sprite_flame_params.scale = 0.6f;
+    sprite_flame_params.scale = {0.6f, 0.6f};
+    sprite_flame_params.side = 30;
     for (int i = 0; i < 16; ++i)
     {
         std::string path = std::string("resources/sprites/flame/anim/") + std::to_string(i) +
@@ -202,6 +274,8 @@ Sprites::Sprites()
     }
     sprite_flame_params.animation_dist = 800;
     sprite_flame_params.animation_speed = 5;
+    sprite_flame_params.dead_shift = 1.8f;
+    sprite_flame_params.is_dead = SpriteStatus::STATUS_IMMORTAL;
     sprite_parameters["sprite_flame"] = std::move(sprite_flame_params);
 
     // image, static/animated, position, shift height, scale

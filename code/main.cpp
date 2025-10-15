@@ -34,7 +34,7 @@ int main()
         sprite_sfx_params.sprite.emplace_back(
                 rg::image::Load("resources/sprites/weapons/sfx/0.png"));
         sprite_sfx_params.shift = 0.5f;
-        sprite_sfx_params.scale = 1.0f;
+        sprite_sfx_params.scale = {1.0f, 1.0f};
         for (int i = 0; i < 9; ++i)
         {
             std::string path = std::string("resources/sprites/weapons/sfx/") + std::to_string(i) +

@@ -6,6 +6,21 @@
 #include "settings.hpp"
 
 
+enum class SpriteFlagType
+{
+    FLAG_DECOR = 0,
+    FLAG_NPC,
+    FLAG_DOOR_V,
+    FLAG_DOOR_H
+};
+
+enum class SpriteStatus
+{
+    STATUS_ALIVE = 0,
+    STATUS_DEAD,
+    STATUS_IMMORTAL
+};
+
 struct SpriteParameter
 {
     // base sprite
@@ -14,8 +29,10 @@ struct SpriteParameter
     bool viewing_angles{};
     // y offset
     float shift{};
-    // size
-    float scale{};
+    // size (x, y)
+    rg::math::Vector2<float> scale{};
+    //
+    float side{};
     // animation sprites
     std::deque<rg::Surface> animation{};
     // minimum distance to animate
@@ -24,6 +41,13 @@ struct SpriteParameter
     int animation_speed{};
     // player collision
     bool blocked{};
+    std::vector<rg::Surface> death_animation{};
+    float death_animation_speed{};
+    float dead_shift{};
+    SpriteStatus is_dead{};
+    SpriteFlagType flag_type{};
+    bool npc_action_trigger{};
+    std::vector<rg::Surface> obj_action{};
 };
 
 struct SpriteProjection
@@ -52,7 +76,16 @@ public:
     float animation_index{};
     float animation_speed{};
 
+    bool npc_action_trigger{};
+    float dead_animation_index{};
+    SpriteStatus is_dead{};
+
 private:
+
+    rg::Surface *dead_animation(float dt);
+    rg::Surface *npc_in_action(float dt);
+    rg::Surface *sprite_animation(float dt);
+    rg::Surface *visible_sprite();
 
     rg::Surface *object{};
 
@@ -66,6 +99,7 @@ private:
     // min/max
     std::vector<rg::math::Vector2<int>> sprite_angles{};
     std::unordered_map<rg::math::Vector2<int>, rg::Surface *> sprite_positions{};
+    double theta{};
 
     Settings *settings;
 };
