@@ -1,6 +1,7 @@
 #include <rygame.hpp>
 
 #include "drawing.hpp"
+#include "interaction.hpp"
 #include "settings.hpp"
 #include "player.hpp"
 #include "ray_casting.hpp"
@@ -27,6 +28,8 @@ int main()
                  static_cast<float>(settings->half_height) - 50.0f},
                 0.f, 120, 1.2f, 0.3f);
         auto drawing = Drawing(sc, &sc_map, &player);
+        auto interaction = Interaction(&player, &sprites, &drawing);
+
         SpriteProjection wall_center{}, closest_obj{};
 
 
@@ -103,9 +106,11 @@ int main()
                         rl::BLEND_ALPHA,
                         sfx_locate.sprite_dimension.x, sfx_locate.sprite_dimension.y);
             }
-            drawing.player_weapon(dt, &sfx);
+            drawing.player_weapon(dt);
 
             drawing.fps(dt);
+
+            interaction.interation_objects();
 
             rg::display::Update();
         }

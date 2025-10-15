@@ -129,11 +129,10 @@ rg::Surface *SpriteObject::dead_animation(const float dt)
         {
             result = &parameter->death_animation[int(dead_animation_index)];
             dead_animation_index += dt * parameter->death_animation_speed;
-        }
-        else
-        {
-            result = &parameter->death_animation.back();
-            dead_animation_index = 0;
+            if (dead_animation_index >= parameter->death_animation.size())
+            {
+                dead_animation_index = parameter->death_animation.size() - 1;
+            }
         }
     }
     return result;

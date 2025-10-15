@@ -17,7 +17,7 @@ public:
     void world(std::vector<SpriteObjectLocate> &locates) const;
     void fps(float dt);
     void mini_map() const;
-    void player_weapon(float dt, SpriteObject *sfx);
+    void player_weapon(float dt);
 
     rg::Surface *sc{};
     rg::Surface *sc_map{};

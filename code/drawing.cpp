@@ -88,7 +88,7 @@ void Drawing::mini_map() const
     sc->Blit(sc_map, settings->map_pos);
 }
 
-void Drawing::player_weapon(const float dt, SpriteObject *sfx)
+void Drawing::player_weapon(const float dt)
 {
     if (player->shot)
     {
@@ -98,11 +98,11 @@ void Drawing::player_weapon(const float dt, SpriteObject *sfx)
         {
             shot_animation_index = 0;
             player->shot = false;
-            shot_animation_trigger = true;
+            shot_animation_trigger = false;
         }
         else
         {
-            shot_animation_trigger = false;
+            shot_animation_trigger = true;
         }
     }
     else

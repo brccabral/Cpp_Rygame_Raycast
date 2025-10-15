@@ -80,6 +80,8 @@ public:
     float dead_animation_index{};
     SpriteStatus is_dead{};
 
+    float distance_to_sprite{};
+
 private:
 
     rg::Surface *dead_animation(float dt);
@@ -89,7 +91,6 @@ private:
 
     rg::Surface *object{};
 
-    float distance_to_sprite{};
     float proj_height{};
     int current_ray{};
     rg::math::Vector2<float> position{};

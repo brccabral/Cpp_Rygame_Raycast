@@ -8,6 +8,7 @@ endif ()
 add_executable(
     ${PROJECT_NAME}
     code/drawing.cpp
+    code/interaction.cpp
     code/main.cpp
     code/maplevels.cpp
     code/player.cpp
