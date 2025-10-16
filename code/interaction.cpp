@@ -88,7 +88,7 @@ void Interaction::interation_objects() const
     }
 }
 
-void Interaction::npc_action() const
+void Interaction::npc_action(const float dt) const
 {
     // npc only triggers action if it is in player's line of sight
     for (auto &obj: sprites->list_of_objects)
@@ -98,11 +98,25 @@ void Interaction::npc_action() const
             if (ray_casting_npc_player(obj.x, obj.y, player->pos()))
             {
                 obj.npc_action_trigger = true;
+                npc_move(&obj, dt);
             }
             else
             {
                 obj.npc_action_trigger = false;
             }
         }
+    }
+}
+
+void Interaction::npc_move(SpriteObject *obj, const float dt) const
+{
+    // npc moves towards player, function triggered only if
+    // npc is in player's line of sight
+    if (obj->distance_to_sprite > Settings::GetInstance()->tile)
+    {
+        const auto dx = obj->x - player->pos().x;
+        const auto dy = obj->y - player->pos().y;
+        obj->x = dx < 0 ? obj->x + dt * obj->obj_speed : obj->x - dt * obj->obj_speed;
+        obj->y = dy < 0 ? obj->y + dt * obj->obj_speed : obj->y - dt * obj->obj_speed;
     }
 }

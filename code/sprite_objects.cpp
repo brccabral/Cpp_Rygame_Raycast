@@ -31,6 +31,7 @@ SpriteObject::SpriteObject(SpriteParameter *parameter, const rg::math::Vector2<f
     is_dead = parameter->is_dead;
 
     flag = parameter->flag_type;
+    obj_speed = parameter->obj_speed;
 }
 
 SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float dt)
@@ -189,7 +190,7 @@ rg::Surface *SpriteObject::visible_sprite()
 
 Sprites::Sprites()
 {
-    SpriteParameter sprite_barrel_params;
+    SpriteParameter sprite_barrel_params{};
     sprite_barrel_params.sprite.emplace_back(
             rg::image::Load("resources/sprites/barrel/base/0.png"));
     sprite_barrel_params.shift = 1.8f;
@@ -214,7 +215,7 @@ Sprites::Sprites()
     sprite_barrel_params.dead_shift = 2.6f;
     sprite_parameters["sprite_barrel"] = std::move(sprite_barrel_params);
 
-    SpriteParameter sprite_pin_params;
+    SpriteParameter sprite_pin_params{};
     sprite_pin_params.sprite.emplace_back(
             rg::image::Load("resources/sprites/pin/base/0.png"));
     sprite_pin_params.shift = 0.6f;
@@ -232,7 +233,7 @@ Sprites::Sprites()
     sprite_pin_params.is_dead = SpriteStatus::STATUS_IMMORTAL;
     sprite_parameters["sprite_pin"] = std::move(sprite_pin_params);
 
-    SpriteParameter sprite_devil_params;
+    SpriteParameter sprite_devil_params{};
     for (int i = 0; i < 8; ++i)
     {
         std::string path = std::string("resources/sprites/devil/base/") + std::to_string(i) +
@@ -261,9 +262,10 @@ Sprites::Sprites()
     sprite_devil_params.death_animation_speed = 10;
     sprite_devil_params.dead_shift = 0.6f;
     sprite_devil_params.flag_type = SpriteFlagType::FLAG_NPC;
+    sprite_devil_params.obj_speed = 30;
     sprite_parameters["sprite_devil"] = std::move(sprite_devil_params);
 
-    SpriteParameter sprite_flame_params;
+    SpriteParameter sprite_flame_params{};
     sprite_flame_params.sprite.emplace_back(
             rg::image::Load("resources/sprites/flame/base/0.png"));
     sprite_flame_params.shift = 0.7f;

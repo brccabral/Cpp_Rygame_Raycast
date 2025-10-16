@@ -48,6 +48,7 @@ struct SpriteParameter
     SpriteFlagType flag_type{};
     bool npc_action_trigger{};
     std::vector<rg::Surface> obj_action{};
+    float obj_speed{};
 };
 
 struct SpriteProjection
@@ -89,6 +90,8 @@ public:
     float distance_to_sprite{};
 
     SpriteFlagType flag{};
+
+    float obj_speed{};
 
 private:
 

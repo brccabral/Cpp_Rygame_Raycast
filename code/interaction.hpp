@@ -12,11 +12,13 @@ public:
 
     Interaction(Player *player, Sprites *sprites, Drawing *drawing);
     void interation_objects() const;
-    void npc_action() const;
+    void npc_action(float dt) const;
 
 private:
 
     Player *player;
     Sprites *sprites;
     Drawing *drawing;
+
+    void npc_move(SpriteObject *obj, float dt) const;
 };
