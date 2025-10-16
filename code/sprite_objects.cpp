@@ -149,9 +149,9 @@ rg::math::Vector2<float> SpriteObject::pos() const
 
 SpriteProjection SpriteObject::sprite_projection() const
 {
-    if (settings->center_ray - side / 2 < current_ray
-        && current_ray < settings->center_ray + side / 2
-        && parameter->blocked)
+    if (settings->center_ray - side / 2.0f < current_ray
+        && current_ray < settings->center_ray + side / 2.0f
+        && blocked)
     {
         return {.depth = distance_to_sprite, .dimensions = {sprite_width, sprite_height}, .x = x,
                 .y = y, .pos = position};

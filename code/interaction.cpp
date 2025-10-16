@@ -67,7 +67,7 @@ void Interaction::interation_objects() const
         std::ranges::sort(
                 sprites->list_of_objects, [](const auto &lhs, const auto &rhs)
                 {
-                    return lhs.distance_to_sprite > rhs.distance_to_sprite;
+                    return lhs.distance_to_sprite < rhs.distance_to_sprite;
                 });
         for (auto &obj: sprites->list_of_objects)
         {

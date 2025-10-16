@@ -1,6 +1,6 @@
 #include "drawing.hpp"
-
 #include "ray_casting.hpp"
+
 
 Drawing::Drawing(rg::Surface *sc, rg::Surface *sc_map, Player *player)
     : sc(sc), sc_map(sc_map), settings(Settings::GetInstance()),
@@ -64,7 +64,7 @@ void Drawing::fps(const float dt)
     sc->Blit(&fps_text_surface, settings->fps_pos);
 }
 
-void Drawing::mini_map(Sprites *sprites) const
+void Drawing::mini_map(const Sprites *sprites) const
 {
     // scale player position
     auto [player_x_map, player_y_map] = rg::math::Vector2{player->x / settings->map_scale,
