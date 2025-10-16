@@ -92,7 +92,7 @@ int main()
                 locates.emplace_back(obj.object_locate(&player, dt));
             }
             drawing.world(locates);
-            drawing.mini_map();
+            drawing.mini_map(&sprites);
 
             if (player.shot)
             {

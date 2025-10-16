@@ -144,7 +144,7 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
 
 rg::math::Vector2<float> SpriteObject::pos() const
 {
-    return {x - side / 2, y - side / 2};
+    return {x - side / 2.0f, y - side / 2.0f};
 }
 
 SpriteProjection SpriteObject::sprite_projection() const
@@ -375,6 +375,34 @@ Sprites::Sprites()
     sprite_door_h_params.flag_type = SpriteFlagType::FLAG_DOOR_V;
     sprite_parameters["sprite_door_h"] = std::move(sprite_door_h_params);
 
+    SpriteParameter sprite_npc_soldier0_params{};
+    for (int i = 0; i < 8; ++i)
+    {
+        std::string path = "resources/sprites/npc/soldier0/base/" + std::to_string(i) + ".png";
+        sprite_npc_soldier0_params.sprite.emplace_back(rg::image::Load(path.c_str()));
+    }
+    sprite_npc_soldier0_params.viewing_angles = true;
+    sprite_npc_soldier0_params.shift = 0.8f;
+    sprite_npc_soldier0_params.scale = {0.4f, 0.6f};
+    sprite_npc_soldier0_params.side = 30;
+    for (int i = 0; i < 10; ++i)
+    {
+        std::string path = "resources/sprites/npc/soldier0/death/" + std::to_string(i) + ".png";
+        sprite_npc_soldier0_params.death_animation.emplace_back(rg::image::Load(path.c_str()));
+    }
+    sprite_npc_soldier0_params.death_animation_speed = 10;
+    sprite_npc_soldier0_params.dead_shift = 1.7f;
+    sprite_npc_soldier0_params.animation_speed = 10;
+    sprite_npc_soldier0_params.blocked = true;
+    sprite_npc_soldier0_params.flag_type = SpriteFlagType::FLAG_NPC;
+    for (int i = 0; i < 4; ++i)
+    {
+        std::string path = "resources/sprites/npc/soldier0/action/" + std::to_string(i) + ".png";
+        sprite_npc_soldier0_params.obj_action.emplace_back(rg::image::Load(path.c_str()));
+    }
+    sprite_npc_soldier0_params.obj_speed = 30;
+    sprite_parameters["sprite_npc_soldier0"] = std::move(sprite_npc_soldier0_params);
+
     // image, static/animated, position, shift height, scale
     list_of_objects.emplace_back(
             &sprite_parameters["sprite_barrel"], rg::math::Vector2{7.1f, 2.1f});
@@ -390,6 +418,20 @@ Sprites::Sprites()
             &sprite_parameters["sprite_door_v"], rg::math::Vector2{3.5f, 3.5f});
     list_of_objects.emplace_back(
             &sprite_parameters["sprite_door_h"], rg::math::Vector2{1.5f, 4.5f});
+    list_of_objects.emplace_back(
+            &sprite_parameters["sprite_npc_soldier0"], rg::math::Vector2{2.5f, 1.5f});
+    list_of_objects.emplace_back(
+            &sprite_parameters["sprite_npc_soldier0"], rg::math::Vector2{5.51f, 1.5f});
+    list_of_objects.emplace_back(
+            &sprite_parameters["sprite_npc_soldier0"], rg::math::Vector2{6.61f, 2.92f});
+    list_of_objects.emplace_back(
+            &sprite_parameters["sprite_npc_soldier0"], rg::math::Vector2{7.68f, 1.47f});
+    list_of_objects.emplace_back(
+            &sprite_parameters["sprite_npc_soldier0"], rg::math::Vector2{8.75f, 3.65f});
+    list_of_objects.emplace_back(
+            &sprite_parameters["sprite_npc_soldier0"], rg::math::Vector2{1.27f, 11.5f});
+    list_of_objects.emplace_back(
+            &sprite_parameters["sprite_npc_soldier0"], rg::math::Vector2{1.26f, 8.29f});
 }
 
 SpriteProjection Sprites::closest_sprite_projection() const

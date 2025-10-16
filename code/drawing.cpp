@@ -64,7 +64,7 @@ void Drawing::fps(const float dt)
     sc->Blit(&fps_text_surface, settings->fps_pos);
 }
 
-void Drawing::mini_map() const
+void Drawing::mini_map(Sprites *sprites) const
 {
     // scale player position
     auto [player_x_map, player_y_map] = rg::math::Vector2{player->x / settings->map_scale,
@@ -84,6 +84,19 @@ void Drawing::mini_map() const
             sc_map, settings->green, {player_x_map, player_y_map}, {
                     player_x_map + settings->width / settings->map_scale * cosf(player->angle),
                     player_y_map + settings->width / settings->map_scale * sinf(player->angle)});
+
+    // npc position
+    for (auto &sprite: sprites->list_of_objects)
+    {
+        if (sprite.flag == SpriteFlagType::FLAG_NPC
+            && sprite.is_dead == SpriteStatus::STATUS_ALIVE)
+        {
+            rg::draw::circle(
+                    sc_map, settings->green,
+                    {sprite.pos().x / settings->map_scale, sprite.pos().y / settings->map_scale},
+                    5);
+        }
+    }
 
     sc->Blit(sc_map, settings->map_pos);
 }
