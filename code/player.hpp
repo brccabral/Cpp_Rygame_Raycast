@@ -40,8 +40,8 @@ private:
     void keys_control(float dt);
     void mouse_control(float dt);
     void detect_collision(float dx, float dy);
+    [[nodiscard]] std::vector<rg::Rect> collision_list() const;
 
     Sprites *sprites{};
-    std::vector<rg::Rect> collision_list{};
 
 };
