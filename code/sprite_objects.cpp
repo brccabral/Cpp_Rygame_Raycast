@@ -29,6 +29,8 @@ SpriteObject::SpriteObject(SpriteParameter *parameter, const rg::math::Vector2<f
 
     animation_speed = parameter->animation_speed;
     is_dead = parameter->is_dead;
+
+    flag = parameter->flag_type;
 }
 
 SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float dt)

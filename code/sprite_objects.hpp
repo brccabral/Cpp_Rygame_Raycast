@@ -88,6 +88,8 @@ public:
 
     float distance_to_sprite{};
 
+    SpriteFlagType flag{};
+
 private:
 
     rg::Surface *dead_animation(float dt);

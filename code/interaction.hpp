@@ -12,6 +12,7 @@ public:
 
     Interaction(Player *player, Sprites *sprites, Drawing *drawing);
     void interation_objects() const;
+    void npc_action() const;
 
 private:
 

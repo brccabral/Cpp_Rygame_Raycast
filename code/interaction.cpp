@@ -87,3 +87,22 @@ void Interaction::interation_objects() const
         }
     }
 }
+
+void Interaction::npc_action() const
+{
+    // npc only triggers action if it is in player's line of sight
+    for (auto &obj: sprites->list_of_objects)
+    {
+        if (obj.flag == SpriteFlagType::FLAG_NPC && obj.is_dead != SpriteStatus::STATUS_DEAD)
+        {
+            if (ray_casting_npc_player(obj.x, obj.y, player->pos()))
+            {
+                obj.npc_action_trigger = true;
+            }
+            else
+            {
+                obj.npc_action_trigger = false;
+            }
+        }
+    }
+}

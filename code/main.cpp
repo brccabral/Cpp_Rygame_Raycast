@@ -115,6 +115,7 @@ int main()
             drawing.fps(dt);
 
             interaction.interation_objects();
+            interaction.npc_action();
             drawing.shot_animation_trigger = false;
 
             rg::display::Update();
