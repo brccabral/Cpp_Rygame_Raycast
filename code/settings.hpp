@@ -76,6 +76,7 @@ struct SpriteObjectLocate
     rg::math::Vector2<float> sprite_dimension{};
     rg::math::Vector2<float> sprite_pos{};
     rg::Rect sprite_area{};
+    // TODO: review
     float x{};
     float y{};
 };

@@ -3,7 +3,8 @@
 #include "ray_casting.hpp"
 
 bool ray_casting_npc_player(
-        const float npc_x, const float npc_y, rg::math::Vector2<float> player_pos)
+        const float npc_x, const float npc_y, rg::math::Vector2<float> player_pos,
+        std::unordered_map<rg::math::Vector2<int>, int> blocked_doors)
 {
     const auto *settings = Settings::GetInstance();
     const auto *map_levels = MapLevels::GetInstance();
@@ -28,7 +29,7 @@ bool ray_casting_npc_player(
         const auto depth_v = (x - ox) / cos_a;
         const auto yv = oy + depth_v * sin_a;
         auto tile_v = mapping(static_cast<float>(x + dx), yv);
-        if (map_levels->world_map.contains(tile_v))
+        if (map_levels->world_map.contains(tile_v) || blocked_doors.contains(tile_v))
         {
             return false;
         }
@@ -44,7 +45,7 @@ bool ray_casting_npc_player(
         const auto depth_h = (y - oy) / sin_a;
         const auto xh = ox + depth_h * cos_a;
         auto tile_h = mapping(xh, static_cast<float>(y + dy));
-        if (map_levels->world_map.contains(tile_h))
+        if (map_levels->world_map.contains(tile_h) || blocked_doors.contains(tile_h))
         {
             return false;
         }
@@ -72,15 +73,24 @@ void Interaction::interation_objects() const
         {
             if (obj.sprite_projection().dimensions.x)
             {
-                if (obj.is_dead != SpriteStatus::STATUS_IMMORTAL && obj.is_dead ==
-                    SpriteStatus::STATUS_ALIVE)
+                if (obj.is_dead == SpriteStatus::STATUS_ALIVE)
                 {
-                    if (ray_casting_npc_player(obj.x, obj.y, player->pos()))
+                    if (ray_casting_npc_player(
+                            obj.x, obj.y, player->pos(), sprites->blocked_doors()))
                     {
                         obj.is_dead = SpriteStatus::STATUS_DEAD;
                         obj.blocked = false;
                         drawing->shot_animation_trigger = false;
                     }
+                }
+
+                // if player is close to the door and shoots, door is triggered
+                if ((obj.flag == SpriteFlagType::FLAG_DOOR_H
+                     || obj.flag == SpriteFlagType::FLAG_DOOR_V)
+                    && obj.distance_to_sprite < Settings::GetInstance()->tile)
+                {
+                    obj.door_open_trigger = true;
+                    obj.blocked = false;
                 }
                 break;
             }
@@ -95,7 +105,7 @@ void Interaction::npc_action(const float dt) const
     {
         if (obj.flag == SpriteFlagType::FLAG_NPC && obj.is_dead != SpriteStatus::STATUS_DEAD)
         {
-            if (ray_casting_npc_player(obj.x, obj.y, player->pos()))
+            if (ray_casting_npc_player(obj.x, obj.y, player->pos(), sprites->blocked_doors()))
             {
                 obj.npc_action_trigger = true;
                 npc_move(&obj, dt);

@@ -41,12 +41,16 @@ struct SpriteParameter
     int animation_speed{};
     // player collision
     bool blocked{};
+    // sprites to play when dying
     std::vector<rg::Surface> death_animation{};
     float death_animation_speed{};
+    // y position offset when dead
     float dead_shift{};
+    // STATUS_ALIVE, STATUS_DEAD, STATUS_IMMORTAL
     SpriteStatus is_dead{};
+    // FLAG_DECOR, FLAG_NPC, FLAG_DOOR_V, FLAG_DOOR_H
     SpriteFlagType flag_type{};
-    bool npc_action_trigger{};
+    // sprites for when npc is in action
     std::vector<rg::Surface> obj_action{};
     float obj_speed{};
 };
@@ -57,6 +61,7 @@ struct SpriteProjection
     float depth{};
     // screen dimension
     rg::math::Vector2<float> dimensions{};
+    // TODO: review
     // world X
     float x{};
     // world Y
@@ -93,12 +98,16 @@ public:
 
     float obj_speed{};
 
+    bool deleted{};
+    bool door_open_trigger{};
+
 private:
 
     rg::Surface *dead_animation(float dt);
     rg::Surface *npc_in_action(float dt);
     rg::Surface *sprite_animation(float dt);
     rg::Surface *visible_sprite();
+    void open_door(float dt);
 
     rg::Surface *object{};
 
@@ -116,6 +125,8 @@ private:
     double theta{};
 
     Settings *settings;
+
+    float door_prev_pos{};
 };
 
 class Sprites
@@ -124,6 +135,8 @@ public:
 
     Sprites();
     SpriteProjection closest_sprite_projection() const;
+    // Returns the mapping position of all closed doors. The value doesn't matter, only the key.
+    std::unordered_map<rg::math::Vector2<int>, int> blocked_doors() const;
 
     std::unordered_map<std::string, SpriteParameter> sprite_parameters{};
     std::vector<SpriteObject> list_of_objects{};

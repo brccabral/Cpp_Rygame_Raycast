@@ -1,5 +1,7 @@
 #include <limits>
 #include "sprite_objects.hpp"
+#include "ray_casting.hpp"
+
 
 SpriteObject::SpriteObject(SpriteParameter *parameter, const rg::math::Vector2<float> pos)
     : parameter(parameter), settings(Settings::GetInstance())
@@ -13,17 +15,36 @@ SpriteObject::SpriteObject(SpriteParameter *parameter, const rg::math::Vector2<f
 
     if (parameter->viewing_angles)
     {
-        sprite_angles.emplace_back(338, 361);
-        sprite_positions[sprite_angles[0]] = &parameter->sprite[0];
-        sprite_angles.emplace_back(0, 23);
-        sprite_positions[sprite_angles[1]] = &parameter->sprite[0];
-        for (int i = 23; i < 338; i += 45)
+        if (parameter->sprite.size() == 8)
         {
-            sprite_angles.emplace_back(i, i + 45);
+            sprite_angles.emplace_back(338, 361);
+            sprite_positions[sprite_angles[0]] = &parameter->sprite[0];
+            sprite_angles.emplace_back(0, 23);
+            sprite_positions[sprite_angles[1]] = &parameter->sprite[0];
+            for (int i = 23; i < 338; i += 45)
+            {
+                sprite_angles.emplace_back(i, i + 45);
+            }
+            for (int i = 2; i < sprite_angles.size(); ++i)
+            {
+                sprite_positions[sprite_angles[i]] = &parameter->sprite[i - 1];
+            }
         }
-        for (int i = 2; i < sprite_angles.size(); ++i)
+        else
+        // doors have 16 viewing angles
         {
-            sprite_positions[sprite_angles[i]] = &parameter->sprite[i - 1];
+            sprite_angles.emplace_back(348, 361);
+            sprite_positions[sprite_angles[0]] = &parameter->sprite[0];
+            sprite_angles.emplace_back(0, 11);
+            sprite_positions[sprite_angles[1]] = &parameter->sprite[0];
+            for (int i = 11; i < 348; i += 23)
+            {
+                sprite_angles.emplace_back(i, i + 23);
+            }
+            for (int i = 2; i < sprite_angles.size(); ++i)
+            {
+                sprite_positions[sprite_angles[i]] = &parameter->sprite[i - 1];
+            }
         }
     }
 
@@ -32,6 +53,8 @@ SpriteObject::SpriteObject(SpriteParameter *parameter, const rg::math::Vector2<f
 
     flag = parameter->flag_type;
     obj_speed = parameter->obj_speed;
+
+    door_prev_pos = flag == SpriteFlagType::FLAG_DOOR_H ? y : x;
 }
 
 SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float dt)
@@ -60,7 +83,10 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
     current_ray = settings->center_ray + delta_rays;
 
     // fix fish eye
-    distance_to_sprite *= cosf(settings->half_fov - current_ray * settings->delta_angle);
+    if (flag != SpriteFlagType::FLAG_DOOR_H && flag != SpriteFlagType::FLAG_DOOR_V)
+    {
+        distance_to_sprite *= cosf(settings->half_fov - current_ray * settings->delta_angle);
+    }
 
     // FAKE_RAYS_RANGE increase rays on the sides to avoid a
     // sprite disappearing when close to the border of the screen
@@ -82,7 +108,16 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
 
         auto shift = half_sprite_height * parameter->shift;
 
-        if (is_dead == SpriteStatus::STATUS_DEAD)
+        if (flag == SpriteFlagType::FLAG_DOOR_H || flag == SpriteFlagType::FLAG_DOOR_V)
+        {
+            if (door_open_trigger)
+            {
+                open_door(dt);
+            }
+            object = visible_sprite();
+            object = sprite_animation(dt);
+        }
+        else if (is_dead == SpriteStatus::STATUS_DEAD)
         {
             object = dead_animation(dt);
             shift = half_sprite_height * parameter->dead_shift;
@@ -188,6 +223,27 @@ rg::Surface *SpriteObject::visible_sprite()
     return object;
 }
 
+void SpriteObject::open_door(const float dt)
+{
+    if (flag == SpriteFlagType::FLAG_DOOR_H)
+    {
+        y -= animation_speed * dt;
+        if (fabsf(y - door_prev_pos) > settings->tile)
+        {
+            deleted = true;
+        }
+    }
+    else if (flag == SpriteFlagType::FLAG_DOOR_V)
+    {
+        x -= animation_speed * dt;
+        if (fabsf(x - door_prev_pos) > settings->tile)
+        {
+            deleted = true;
+        }
+        printf("x %f\n", x);
+    }
+}
+
 Sprites::Sprites()
 {
     SpriteParameter sprite_barrel_params{};
@@ -283,6 +339,43 @@ Sprites::Sprites()
     sprite_flame_params.is_dead = SpriteStatus::STATUS_IMMORTAL;
     sprite_parameters["sprite_flame"] = std::move(sprite_flame_params);
 
+    // door vertical - vertical from the map view
+    SpriteParameter sprite_door_v_params{};
+    for (int i = 0; i < 16; ++i)
+    {
+        std::string path = "resources/sprites/doors/door_v/" + std::to_string(i) + ".png";
+        sprite_door_v_params.sprite.emplace_back(rg::image::Load(path.c_str()));
+    }
+    sprite_door_v_params.viewing_angles = true;
+    sprite_door_v_params.shift = 0.1f;
+    sprite_door_v_params.scale = {2.6f, 1.2f};
+    sprite_door_v_params.side = 100;
+    sprite_door_v_params.is_dead = SpriteStatus::STATUS_IMMORTAL;
+    sprite_door_v_params.animation_speed = 60;
+    sprite_door_v_params.blocked = true;
+    // flag is inverted (h or v) because will indicate the
+    // direction it will move once it is opened
+    sprite_door_v_params.flag_type = SpriteFlagType::FLAG_DOOR_H;
+    sprite_parameters["sprite_door_v"] = std::move(sprite_door_v_params);
+
+    SpriteParameter sprite_door_h_params{};
+    for (int i = 0; i < 16; ++i)
+    {
+        std::string path = "resources/sprites/doors/door_h/" + std::to_string(i) + ".png";
+        sprite_door_h_params.sprite.emplace_back(rg::image::Load(path.c_str()));
+    }
+    sprite_door_h_params.viewing_angles = true;
+    sprite_door_h_params.shift = 0.1f;
+    sprite_door_h_params.scale = {2.6f, 1.2f};
+    sprite_door_h_params.side = 100;
+    sprite_door_h_params.is_dead = SpriteStatus::STATUS_IMMORTAL;
+    sprite_door_h_params.animation_speed = 60;
+    sprite_door_h_params.blocked = true;
+    // flag is inverted (h or v) because will indicate the
+    // direction it will move once it is opened
+    sprite_door_h_params.flag_type = SpriteFlagType::FLAG_DOOR_V;
+    sprite_parameters["sprite_door_h"] = std::move(sprite_door_h_params);
+
     // image, static/animated, position, shift height, scale
     list_of_objects.emplace_back(
             &sprite_parameters["sprite_barrel"], rg::math::Vector2{7.1f, 2.1f});
@@ -294,6 +387,10 @@ Sprites::Sprites()
             &sprite_parameters["sprite_devil"], rg::math::Vector2{7.0f, 4.0f});
     list_of_objects.emplace_back(
             &sprite_parameters["sprite_flame"], rg::math::Vector2{8.6f, 5.6f});
+    list_of_objects.emplace_back(
+            &sprite_parameters["sprite_door_v"], rg::math::Vector2{3.5f, 3.5f});
+    list_of_objects.emplace_back(
+            &sprite_parameters["sprite_door_h"], rg::math::Vector2{1.5f, 4.5f});
 }
 
 SpriteProjection Sprites::closest_sprite_projection() const
@@ -306,6 +403,21 @@ SpriteProjection Sprites::closest_sprite_projection() const
         if (proj.depth < result.depth)
         {
             result = proj;
+        }
+    }
+    return result;
+}
+
+std::unordered_map<rg::math::Vector2<int>, int> Sprites::blocked_doors() const
+{
+    std::unordered_map<rg::math::Vector2<int>, int> result;
+    for (const auto &obj: list_of_objects)
+    {
+        if ((obj.flag == SpriteFlagType::FLAG_DOOR_H || obj.flag == SpriteFlagType::FLAG_DOOR_V)
+            && obj.blocked)
+        {
+            auto [i,j] = mapping(obj.x, obj.y);
+            result[{i, j}] = 0;
         }
     }
     return result;
