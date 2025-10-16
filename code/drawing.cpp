@@ -21,6 +21,8 @@ Drawing::Drawing(rg::Surface *sc, rg::Surface *sc_map, Player *player)
     weapon_rect = weapon_base_sprite.GetRect();
     weapon_pos = {settings->half_width - weapon_rect.width / 2,
                   settings->height - weapon_rect.height};
+
+    shot_sound = rg::mixer::Sound("resources/sound/shotgun.wav");
 }
 
 void Drawing::background()
@@ -105,6 +107,10 @@ void Drawing::player_weapon(const float dt)
 {
     if (player->shot)
     {
+        if (shot_animation_index == 0)
+        {
+            shot_sound.Play();
+        }
         weapon_sprite = &weapon_shot_animation[int(shot_animation_index)];
         shot_animation_index += shot_animation_speed * dt;
         if (shot_animation_index >= weapon_shot_animation.size())

@@ -34,8 +34,9 @@ public:
     std::deque<rg::Surface> weapon_shot_animation{};
     rg::Rect weapon_rect{};
     rg::math::Vector2<float> weapon_pos{};
-    float shot_length_index{};
     float shot_animation_speed = 24.0f;
     float shot_animation_index{};
     bool shot_animation_trigger = true;
+
+    rg::mixer::Sound shot_sound{};
 };
