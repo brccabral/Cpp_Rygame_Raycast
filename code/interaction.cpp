@@ -70,7 +70,7 @@ void Interaction::interation_objects() const
                 });
         for (auto &obj: sprites->list_of_objects)
         {
-            if (obj.sprite_projection().proj_height)
+            if (obj.sprite_projection().dimensions.x)
             {
                 if (obj.is_dead != SpriteStatus::STATUS_IMMORTAL && obj.is_dead ==
                     SpriteStatus::STATUS_ALIVE)

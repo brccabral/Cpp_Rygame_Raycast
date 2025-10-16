@@ -45,7 +45,7 @@ int main()
             sprite_sfx_params.animation.emplace_back(rg::image::Load(path.c_str()));
         }
         sprite_sfx_params.animation_dist = 80000.0f;
-        sprite_sfx_params.animation_speed = 5;
+        sprite_sfx_params.animation_speed = 15;
 
         SpriteObject sfx{&sprite_sfx_params, rg::math::Vector2{800.0f, 800.0f}};
 
@@ -63,9 +63,10 @@ int main()
             if (rl::IsMouseButtonPressed(rl::MOUSE_BUTTON_LEFT) && !player.shot)
             {
                 player.shoot();
+                drawing.shot_animation_trigger = true;
+                sfx.animation_index = 0;
                 wall_center = {.depth = walls[settings->center_ray].depth,
-                               .proj_height = walls[settings->center_ray].
-                                              sprite_dimension.y,
+                               .dimensions = walls[settings->center_ray].sprite_dimension,
                                .x = walls[settings->center_ray].x,
                                .y = walls[settings->center_ray].y
                 };
@@ -93,24 +94,28 @@ int main()
             drawing.world(locates);
             drawing.mini_map();
 
-            if (!player.shot)
-            {
-                sfx.x = 800.0f;
-                sfx.y = 800.0f;
-            }
-            else
+            if (player.shot)
             {
                 auto sfx_locate = sfx.object_locate(&player, dt);
-                sc->Blit(
-                        sfx_locate.sprite, sfx_locate.sprite_pos, sfx_locate.sprite_area,
-                        rl::BLEND_ALPHA,
-                        sfx_locate.sprite_dimension.x, sfx_locate.sprite_dimension.y);
+                if (sfx.animation_index == 0)
+                {
+                    sfx.x = 8000.0f;
+                    sfx.y = 8000.0f;
+                }
+                else
+                {
+                    sc->Blit(
+                            sfx_locate.sprite, sfx_locate.sprite_pos, sfx_locate.sprite_area,
+                            rl::BLEND_ALPHA,
+                            sfx_locate.sprite_dimension.x, sfx_locate.sprite_dimension.y);
+                }
             }
             drawing.player_weapon(dt);
 
             drawing.fps(dt);
 
             interaction.interation_objects();
+            drawing.shot_animation_trigger = false;
 
             rg::display::Update();
         }

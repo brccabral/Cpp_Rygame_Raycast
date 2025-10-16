@@ -98,11 +98,6 @@ void Drawing::player_weapon(const float dt)
         {
             shot_animation_index = 0;
             player->shot = false;
-            shot_animation_trigger = false;
-        }
-        else
-        {
-            shot_animation_trigger = true;
         }
     }
     else

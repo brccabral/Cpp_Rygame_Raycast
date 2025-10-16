@@ -52,10 +52,16 @@ struct SpriteParameter
 
 struct SpriteProjection
 {
+    // distance from player
     float depth{};
-    float proj_height{};
+    // screen dimension
+    rg::math::Vector2<float> dimensions{};
+    // world X
     float x{};
+    // world Y
     float y{};
+    // screen position
+    rg::math::Vector2<float> pos{};
 };
 
 class SpriteObject
@@ -92,6 +98,8 @@ private:
     rg::Surface *object{};
 
     float proj_height{};
+    float sprite_width{};
+    float sprite_height{};
     int current_ray{};
     rg::math::Vector2<float> position{};
 

@@ -72,8 +72,8 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
                 int(settings->proj_coeff / distance_to_sprite),
                 settings->double_height);
 
-        auto sprite_width = proj_height * parameter->scale.x;
-        auto sprite_height = proj_height * parameter->scale.y;
+        sprite_width = proj_height * parameter->scale.x;
+        sprite_height = proj_height * parameter->scale.y;
         const auto half_sprite_width = sprite_width / 2.0f;
         const auto half_sprite_height = sprite_height / 2.0f;
 
@@ -99,8 +99,7 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
 
         return {.depth = distance_to_sprite, .sprite = object,
                 .sprite_dimension = {sprite_width, sprite_height},
-                .sprite_pos = position,
-                .sprite_area = {}};
+                .sprite_pos = position, .sprite_area = {}, .x = x, .y = y};
     }
     return {};
 }
@@ -112,12 +111,15 @@ rg::math::Vector2<float> SpriteObject::pos() const
 
 SpriteProjection SpriteObject::sprite_projection() const
 {
-    if (settings->center_ray - side < current_ray && current_ray < settings->center_ray + side &&
-        parameter->blocked)
+    if (settings->center_ray - side / 2 < current_ray
+        && current_ray < settings->center_ray + side / 2
+        && parameter->blocked)
     {
-        return {.depth = distance_to_sprite, .proj_height = proj_height, .x = x, .y = y};
+        return {.depth = distance_to_sprite, .dimensions = {sprite_width, sprite_height}, .x = x,
+                .y = y, .pos = position};
     }
-    return {.depth = std::numeric_limits<float>::infinity(), .proj_height = 0, .x = 0, .y = 0};
+    return {.depth = std::numeric_limits<float>::infinity(), .dimensions = {}, .x = 0, .y = 0,
+            .pos = {}};
 }
 
 rg::Surface *SpriteObject::dead_animation(const float dt)
@@ -141,7 +143,7 @@ rg::Surface *SpriteObject::dead_animation(const float dt)
 rg::Surface *SpriteObject::npc_in_action(const float dt)
 {
     rg::Surface *result = &parameter->obj_action[int(animation_index)];
-    animation_index += dt * parameter->animation_speed;
+    animation_index += dt * animation_speed;
     if (animation_index >= parameter->obj_action.size())
     {
         animation_index = 0;
@@ -153,7 +155,7 @@ rg::Surface *SpriteObject::sprite_animation(const float dt)
 {
     if (!parameter->animation.empty() && distance_to_sprite < parameter->animation_dist)
     {
-        animation_index += dt * parameter->animation_speed;
+        animation_index += dt * animation_speed;
         if (animation_index >= parameter->animation.size())
         {
             animation_index = 0;
@@ -293,7 +295,7 @@ Sprites::Sprites()
 SpriteProjection Sprites::closest_sprite_projection() const
 {
     SpriteProjection result{.depth = std::numeric_limits<float>::infinity(),
-                            .proj_height = 0, .x = 0, .y = 0};
+                            .dimensions = {}, .x = 0, .y = 0, .pos = {}};
     for (const auto &obj: list_of_objects)
     {
         const auto proj = obj.sprite_projection();
