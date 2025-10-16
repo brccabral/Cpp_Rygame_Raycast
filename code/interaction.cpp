@@ -58,6 +58,7 @@ bool ray_casting_npc_player(
 Interaction::Interaction(Player *player, Sprites *sprites, Drawing *drawing)
     : player(player), sprites(sprites), drawing(drawing)
 {
+    pain_sound = rg::mixer::Sound("resources/sound/pain.wav");
 }
 
 void Interaction::interation_objects() const
@@ -81,6 +82,10 @@ void Interaction::interation_objects() const
                         obj.is_dead = SpriteStatus::STATUS_DEAD;
                         obj.blocked = false;
                         drawing->shot_animation_trigger = false;
+                        if (obj.flag == SpriteFlagType::FLAG_NPC)
+                        {
+                            pain_sound.Play();
+                        }
                     }
                 }
 

@@ -24,4 +24,6 @@ private:
     Drawing *drawing;
 
     void npc_move(SpriteObject *obj, float dt) const;
+
+    rg::mixer::Sound pain_sound{};
 };
