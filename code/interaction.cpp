@@ -118,6 +118,15 @@ void Interaction::npc_action(const float dt) const
     }
 }
 
+void Interaction::clear_world() const
+{
+    std::erase_if(
+            sprites->list_of_objects, [](const auto &obj)
+            {
+                return obj.deleted;
+            });
+}
+
 void Interaction::npc_move(SpriteObject *obj, const float dt) const
 {
     // npc moves towards player, function triggered only if

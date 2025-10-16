@@ -116,6 +116,7 @@ int main()
 
             interaction.interation_objects();
             interaction.npc_action(dt);
+            interaction.clear_world();
             drawing.shot_animation_trigger = false;
 
             rg::display::Update();

@@ -240,7 +240,6 @@ void SpriteObject::open_door(const float dt)
         {
             deleted = true;
         }
-        printf("x %f\n", x);
     }
 }
 

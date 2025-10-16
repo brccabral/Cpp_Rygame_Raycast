@@ -15,6 +15,7 @@ public:
     Interaction(Player *player, Sprites *sprites, Drawing *drawing);
     void interation_objects() const;
     void npc_action(float dt) const;
+    void clear_world() const;
 
 private:
 
