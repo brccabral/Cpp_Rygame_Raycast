@@ -49,6 +49,9 @@ int main()
 
         SpriteObject sfx{&sprite_sfx_params, rg::math::Vector2{800.0f, 800.0f}};
 
+        auto music = rg::mixer::Sound("resources/sound/theme.mp3", true);
+        music.Play();
+
         while (!rg::WindowCloseOrQuit())
         {
             dt = rl::GetFrameTime();
