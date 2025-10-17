@@ -5,6 +5,8 @@ if (NOT TARGET rygame)
     find_package(rygame REQUIRED)
 endif ()
 
+option(SHOW_FPS "show FPS" OFF)
+
 add_executable(
     ${PROJECT_NAME}
     code/drawing.cpp
@@ -17,6 +19,10 @@ add_executable(
     code/sprite_objects.cpp
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE rygame)
+
+if (SHOW_FPS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE "SHOW_FPS")
+endif ()
 
 add_custom_command(
     TARGET ${PROJECT_NAME}

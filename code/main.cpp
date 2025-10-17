@@ -117,7 +117,9 @@ int main()
             }
             drawing.player_weapon(dt);
 
+#if SHOW_FPS
             drawing.fps(dt);
+#endif
 
             interaction.interation_objects();
             interaction.npc_action(dt);
