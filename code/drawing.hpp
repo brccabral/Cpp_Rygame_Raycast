@@ -19,6 +19,7 @@ public:
     void mini_map(const Sprites *sprites) const;
     void player_weapon(float dt);
     void win() const;
+    void menu();
 
     rg::Surface *sc{};
     rg::Surface *sc_map{};

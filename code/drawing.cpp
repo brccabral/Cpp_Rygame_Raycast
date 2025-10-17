@@ -144,3 +144,51 @@ void Drawing::win() const
     }
     rg::RygameQuit();
 }
+
+void Drawing::menu()
+{
+    // bg will move
+    auto x = 0.0f;
+    auto button_font = rg::font::Font("resources/font/font.ttf", 144);
+    auto label_font = rg::font::Font("resources/font/font1.otf", 280);
+
+    auto start_surface = button_font.render("START", rl::LIGHTGRAY);
+    auto button_start = rg::Rect{0, 0, 400, 150};
+    button_start.center(settings->half_width, settings->half_height);
+    auto start_pos = button_start.center() - start_surface.GetRect().center();
+
+    auto exit_surface = button_font.render("EXIT", rl::LIGHTGRAY);
+    auto button_exit = rg::Rect{0, 0, 400, 150};
+    button_exit.center(settings->half_width, settings->half_height + 200);
+    auto exit_pos = button_exit.center() - exit_surface.GetRect().center();
+
+    auto menu_picture = rg::image::Load("resources/images/bg.jpg");
+
+    auto show_menu = true;
+    while (show_menu)
+    {
+        show_menu = !rg::WindowCloseOrQuit();
+        auto dt = rl::GetFrameTime();
+        sc->Blit(
+                &menu_picture, rg::math::Vector2<float>{},
+                {int(x) % settings->width, settings->half_height, settings->width,
+                 -settings->height});
+        x += 100 * dt;
+        rg::draw::rect(sc, settings->black, button_start, 10, 25);
+        sc->Blit(&start_surface, start_pos);
+        rg::draw::rect(sc, settings->black, button_exit, 10, 25);
+        sc->Blit(&exit_surface, exit_pos);
+
+        // blink title
+        unsigned char color = rg::math::get_random_uniform(0, 40);
+        auto label = label_font.render("DOOMRy", {color, color, color, 255});
+        auto label_pos = rg::math::Vector2{static_cast<float>(settings->half_width),
+                                           static_cast<float>(settings->half_height)};
+        label_pos = label_pos - label.GetRect().center();
+        label_pos.y = -30;
+        sc->Blit(&label, label_pos); // font has some padding on Y
+
+        rg::display::Update();
+    }
+
+}

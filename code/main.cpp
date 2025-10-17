@@ -18,7 +18,6 @@ int main()
         auto *sc = &rg::display::SetMode(settings->width, settings->height);
         auto sc_map = rg::Surface(settings->minimap_res.x, settings->minimap_res.y);
 
-        rl::HideCursor();
         float dt = 0;
 
         Sprites sprites{};
@@ -29,6 +28,10 @@ int main()
                 0.f, 120, 1.2f, 0.3f);
         auto drawing = Drawing(sc, &sc_map, &player);
         auto interaction = Interaction(&player, &sprites, &drawing);
+
+        drawing.menu();
+
+        rg::mouse::set_visible(false);
 
         SpriteProjection wall_center{}, closest_obj{};
 
