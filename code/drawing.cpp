@@ -145,7 +145,7 @@ void Drawing::win() const
     rg::RygameQuit();
 }
 
-void Drawing::menu()
+void Drawing::menu() const
 {
     // bg will move
     auto x = 0.0f;
@@ -187,6 +187,26 @@ void Drawing::menu()
         label_pos = label_pos - label.GetRect().center();
         label_pos.y = -30;
         sc->Blit(&label, label_pos); // font has some padding on Y
+
+        auto mouse_pos = rg::mouse::get_pos();
+        if (button_start.collidepoint(mouse_pos))
+        {
+            rg::draw::rect(sc, settings->black, button_start, 0, 25);
+            sc->Blit(&start_surface, button_start.center() - start_surface.GetRect().center());
+            if (rl::IsMouseButtonPressed(rl::MOUSE_BUTTON_LEFT))
+            {
+                show_menu = false;
+            }
+        }
+        if (button_exit.collidepoint(mouse_pos))
+        {
+            rg::draw::rect(sc, settings->black, button_exit, 0, 25);
+            sc->Blit(&exit_surface, button_exit.center() - exit_surface.GetRect().center());
+            if (rl::IsMouseButtonPressed(rl::MOUSE_BUTTON_LEFT))
+            {
+                rg::RygameQuit();
+            }
+        }
 
         rg::display::Update();
     }

@@ -31,6 +31,7 @@ int main()
 
         drawing.menu();
 
+        // grab mouse after the menu screen to use mouse to control player FOV
         rg::mouse::set_visible(false);
 
         SpriteProjection wall_center{}, closest_obj{};
