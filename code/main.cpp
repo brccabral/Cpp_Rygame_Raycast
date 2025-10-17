@@ -16,6 +16,7 @@ int main()
         const Settings *settings = Settings::GetInstance();
 
         auto *sc = &rg::display::SetMode(settings->width, settings->height);
+        rg::display::SetCaption("DOOM Rygame");
         auto sc_map = rg::Surface(settings->minimap_res.x, settings->minimap_res.y);
 
         float dt = 0;
@@ -34,8 +35,7 @@ int main()
         // grab mouse after the menu screen to use mouse to control player FOV
         rg::mouse::set_visible(false);
 
-        SpriteProjection wall_center{}, closest_obj{};
-
+        SpriteProjection wall_center, closest_obj;
 
         SpriteParameter sprite_sfx_params;
         sprite_sfx_params.sprite.emplace_back(
