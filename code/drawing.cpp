@@ -125,3 +125,18 @@ void Drawing::player_weapon(const float dt)
     }
     sc->Blit(weapon_sprite, weapon_pos);
 }
+
+void Drawing::win() const
+{
+    const auto random_red = rl::Color{
+            static_cast<unsigned char>(rg::math::get_random_uniform(40, 120)),
+            0, 0, 255};
+
+    auto render = font_win.render("YOU WIN!!!", random_red);
+    auto rect = rg::Rect{0, 0, 1000, 300};
+    rect.center(settings->half_width, settings->half_height);
+    rg::draw::rect(sc, settings->black, rect, 0, 50);
+    sc->Blit(&render, rect.center() - render.GetRect().center());
+    sc->Draw();
+    rg::display::Update();
+}

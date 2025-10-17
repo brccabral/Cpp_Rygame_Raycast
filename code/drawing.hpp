@@ -18,6 +18,7 @@ public:
     void fps(float dt);
     void mini_map(const Sprites *sprites) const;
     void player_weapon(float dt);
+    void win() const;
 
     rg::Surface *sc{};
     rg::Surface *sc_map{};
@@ -25,7 +26,8 @@ public:
     MapLevels *map_levels{};
     Player *player{};
     rg::Surface fps_text_surface{};
-    rg::font::Font font{"/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Bold.ttf", 36};
+    rg::font::Font font{"resources/font/DejaVuSansCondensed-Bold.ttf", 36};
+    rg::font::Font font_win{"resources/font/font.ttf", 144};
     std::unordered_map<int, rg::Surface> textures{};
     rg::Surface sky_surface{};
 

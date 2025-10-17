@@ -132,6 +132,31 @@ void Interaction::clear_world() const
             });
 }
 
+void Interaction::check_win() const
+{
+    int count_alive = 0;
+    for (const auto &obj: sprites->list_of_objects)
+    {
+        if (obj.is_dead == SpriteStatus::STATUS_ALIVE && obj.flag == SpriteFlagType::FLAG_NPC)
+        {
+            ++count_alive;
+        }
+    }
+
+    if (!count_alive)
+    {
+        rg::mixer::music::stop();
+        auto win_sound = rg::mixer::Sound("resources/sound/win.mp3");
+        win_sound.Play();
+        while (!rg::WindowCloseOrQuit())
+        {
+            drawing->win();
+        }
+        rg::RygameQuit();
+    }
+
+}
+
 void Interaction::npc_move(SpriteObject *obj, const float dt) const
 {
     // npc moves towards player, function triggered only if

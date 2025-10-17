@@ -16,6 +16,7 @@ public:
     void interation_objects() const;
     void npc_action(float dt) const;
     void clear_world() const;
+    void check_win() const;
 
 private:
 
