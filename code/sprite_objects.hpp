@@ -61,13 +61,10 @@ struct SpriteProjection
     float depth{};
     // screen dimension
     rg::math::Vector2<float> dimensions{};
-    // TODO: review
     // world X
     float x{};
     // world Y
     float y{};
-    // screen position
-    rg::math::Vector2<float> pos{};
 };
 
 class SpriteObject

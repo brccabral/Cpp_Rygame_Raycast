@@ -16,5 +16,5 @@ void ray_casting_distance(
         rg::Surface *sc, rg::Surface *sc_map, const Player *player,
         std::unordered_map<int, rg::Surface> *textures);
 // return list of SpriteObjectLocate (walls) - depth, surface, dimension, pos, texture area
-std::vector<SpriteObjectLocate> &ray_casting_depth(
+std::vector<SpriteObjectLocate> ray_casting_depth(
         rg::Surface *sc_map, const Player *player, std::unordered_map<int, rg::Surface> *textures);

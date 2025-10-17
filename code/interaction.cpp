@@ -4,7 +4,7 @@
 
 bool ray_casting_npc_player(
         const float npc_x, const float npc_y, rg::math::Vector2<float> player_pos,
-        std::unordered_map<rg::math::Vector2<int>, int> blocked_doors)
+        const std::unordered_map<rg::math::Vector2<int>, int> &blocked_doors)
 {
     const auto *settings = Settings::GetInstance();
     const auto *map_levels = MapLevels::GetInstance();
@@ -146,7 +146,7 @@ void Interaction::check_win() const
     if (!count_alive)
     {
         rg::mixer::music::stop();
-        auto win_sound = rg::mixer::Sound("resources/sound/win.mp3");
+        const auto win_sound = rg::mixer::Sound("resources/sound/win.mp3");
         win_sound.Play();
         drawing->win();
     }

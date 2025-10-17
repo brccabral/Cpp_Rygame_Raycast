@@ -56,6 +56,8 @@ int main()
         auto music = rg::mixer::Sound("resources/sound/theme.mp3", true);
         music.Play();
 
+        std::vector<SpriteObjectLocate> locates;
+
         while (!rg::WindowCloseOrQuit())
         {
             dt = rl::GetFrameTime();
@@ -73,10 +75,7 @@ int main()
                 drawing.shot_animation_trigger = true;
                 sfx.animation_index = 0;
                 wall_center = {.depth = walls[settings->center_ray].depth,
-                               .dimensions = walls[settings->center_ray].sprite_dimension,
-                               .x = walls[settings->center_ray].x,
-                               .y = walls[settings->center_ray].y
-                };
+                               .dimensions = walls[settings->center_ray].sprite_dimension};
                 closest_obj = sprites.closest_sprite_projection();
                 if (wall_center.depth < closest_obj.depth)
                 {
@@ -90,7 +89,6 @@ int main()
                 }
             }
 
-            static std::vector<SpriteObjectLocate> locates;
             locates.clear();
             locates.reserve(walls.size() + sprites.list_of_objects.size());
             locates.insert(locates.end(), walls.begin(), walls.end());

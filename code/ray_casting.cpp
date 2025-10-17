@@ -66,14 +66,13 @@ void ray_casting_distance(
     }
 }
 
-std::vector<SpriteObjectLocate> &ray_casting_depth(
+std::vector<SpriteObjectLocate> ray_casting_depth(
         rg::Surface *sc_map, const Player *player, std::unordered_map<int, rg::Surface> *textures)
 {
     const Settings *settings = Settings::GetInstance();
     const MapLevels *map_levels = MapLevels::GetInstance();
 
-    static std::vector<SpriteObjectLocate> walls{};
-    walls.clear();
+    std::vector<SpriteObjectLocate> walls{};
     walls.reserve(settings->num_rays);
 
     auto [ox, oy] = player->pos();
@@ -83,8 +82,9 @@ std::vector<SpriteObjectLocate> &ray_casting_depth(
     // rays of field of view on minimap
     // game won't crash if player goes out of map
     auto [ray_x_v, ray_y_v] = player->pos();
-    auto ray_x_h = ray_x_v, ray_x = ray_x_v;
-    auto ray_y_h = ray_y_v, ray_y = ray_y_v;
+    auto ray_x_h = ray_x_v;
+    auto ray_y_h = ray_y_v;
+    float ray_x, ray_y;
 
     float depth = 0, depth_v = 0, depth_h = 0;
 
@@ -175,8 +175,7 @@ std::vector<SpriteObjectLocate> &ray_casting_depth(
                                   settings->half_height - proj_height / 2.0f},
                 rg::Rect{offset * settings->texture_scale, 0.0f,
                          static_cast<float>(settings->texture_scale),
-                         -static_cast<float>(settings->texture_height)},
-                ray_x, ray_y);
+                         -static_cast<float>(settings->texture_height)});
         cur_angle += settings->delta_angle;
     }
 

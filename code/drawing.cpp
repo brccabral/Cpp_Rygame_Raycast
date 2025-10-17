@@ -49,7 +49,7 @@ void Drawing::world(std::vector<SpriteObjectLocate> &locates) const
              sprite,
              sprite_dimension,
              sprite_pos,
-             sprite_area, x, y]: locates)
+             sprite_area]: locates)
     {
         if (depth)
         {

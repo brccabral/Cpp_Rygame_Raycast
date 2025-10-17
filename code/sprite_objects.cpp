@@ -137,7 +137,7 @@ SpriteObjectLocate SpriteObject::object_locate(const Player *player, const float
 
         return {.depth = distance_to_sprite, .sprite = object,
                 .sprite_dimension = {sprite_width, sprite_height},
-                .sprite_pos = position, .sprite_area = {}, .x = x, .y = y};
+                .sprite_pos = position, .sprite_area = {}};
     }
     return {};
 }
@@ -153,11 +153,10 @@ SpriteProjection SpriteObject::sprite_projection() const
         && current_ray < settings->center_ray + side / 2.0f
         && blocked)
     {
-        return {.depth = distance_to_sprite, .dimensions = {sprite_width, sprite_height}, .x = x,
-                .y = y, .pos = position};
+        return {.depth = distance_to_sprite, .dimensions = {sprite_width, sprite_height},
+                .x = x, .y = y};
     }
-    return {.depth = std::numeric_limits<float>::infinity(), .dimensions = {}, .x = 0, .y = 0,
-            .pos = {}};
+    return {.depth = std::numeric_limits<float>::infinity(), .dimensions = {}, .x = x, .y = y};
 }
 
 rg::Surface *SpriteObject::dead_animation(const float dt)
@@ -233,7 +232,7 @@ void SpriteObject::open_door(const float dt)
             deleted = true;
         }
     }
-    else if (flag == SpriteFlagType::FLAG_DOOR_V)
+    else
     {
         x -= animation_speed * dt;
         if (fabsf(x - door_prev_pos) > settings->tile)
@@ -437,7 +436,7 @@ Sprites::Sprites()
 SpriteProjection Sprites::closest_sprite_projection() const
 {
     SpriteProjection result{.depth = std::numeric_limits<float>::infinity(),
-                            .dimensions = {}, .x = 0, .y = 0, .pos = {}};
+                            .dimensions = {}, .x = {}, .y = {}};
     for (const auto &obj: list_of_objects)
     {
         const auto proj = obj.sprite_projection();
