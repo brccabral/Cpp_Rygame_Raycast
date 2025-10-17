@@ -87,11 +87,21 @@ void Player::keys_control(const float dt)
 
 void Player::mouse_control(const float dt)
 {
-    // const float difference = rl::GetMouseDelta().x;
+#if EMSCRIPTEN
+    static auto prev_mouse_x = rl::GetMouseX();
+    const auto mouse_x = rl::GetMouseX();
+    static auto difference = mouse_x - prev_mouse_x;
+    if (rl::IsCursorOnScreen())
+    {
+        difference = mouse_x - prev_mouse_x;
+        prev_mouse_x = mouse_x;
+    }
+#else
     const float difference = rl::GetMousePosition().x - settings->half_width;
     // always center the mouse after detecting the difference to
     // have the same reference at all passes
     rl::SetMousePosition(settings->half_width, settings->half_height);
+#endif
     angle += difference * mouse_sensitivity * dt;
 }
 
