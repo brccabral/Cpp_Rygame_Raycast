@@ -148,11 +148,7 @@ void Interaction::check_win() const
         rg::mixer::music::stop();
         auto win_sound = rg::mixer::Sound("resources/sound/win.mp3");
         win_sound.Play();
-        while (!rg::WindowCloseOrQuit())
-        {
-            drawing->win();
-        }
-        rg::RygameQuit();
+        drawing->win();
     }
 
 }
